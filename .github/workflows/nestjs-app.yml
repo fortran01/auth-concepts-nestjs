@@ -27,9 +27,13 @@ jobs:
         run: |
           # Run npm install instead of npm ci to update the lock file
           npm install
+          # Make sure eslint is installed
+          npm install -D eslint
 
       - name: Lint
-        run: npm run lint
+        run: |
+          # Use npx to run eslint from node_modules
+          npx eslint "{src,apps,libs,test}/**/*.ts" --fix
 
       - name: Set up environment variables
         run: |
@@ -61,7 +65,10 @@ jobs:
           cache: "npm"
 
       - name: Install dependencies
-        run: npm install
+        run: |
+          npm install
+          # Make sure eslint is installed
+          npm install -D eslint
 
       - name: Build
         run: npm run build
