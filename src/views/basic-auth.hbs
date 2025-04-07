@@ -1,0 +1,49 @@
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h2 class="mb-0">Basic Authentication Success</h2>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-success">
+                    <h4 class="alert-heading">Authentication Successful!</h4>
+                    <p>{{message}}</p>
+                </div>
+                
+                <h4>User Information:</h4>
+                <table class="table table-striped">
+                    <tbody>
+                        <tr>
+                            <th>User ID:</th>
+                            <td>{{user.userId}}</td>
+                        </tr>
+                        <tr>
+                            <th>Username:</th>
+                            <td>{{user.username}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <h4 class="mt-4">How Basic Authentication Works:</h4>
+                <ol>
+                    <li>The client makes a request to a protected resource.</li>
+                    <li>The server responds with a 401 Unauthorized status and includes a WWW-Authenticate header.</li>
+                    <li>The browser prompts the user for credentials.</li>
+                    <li>The credentials are sent in the Authorization header in base64 encoded format.</li>
+                    <li>The server decodes the credentials and validates them.</li>
+                    <li>If valid, the server grants access to the protected resource.</li>
+                </ol>
+                
+                <h4 class="mt-4">Security Considerations:</h4>
+                <ul>
+                    <li>Basic Authentication should only be used over HTTPS to prevent credential theft.</li>
+                    <li>Passwords should be securely hashed (not stored in plain text).</li>
+                    <li>For production systems, consider more robust authentication mechanisms like JWT or OAuth 2.0.</li>
+                </ul>
+            </div>
+            <div class="card-footer">
+                <a href="/" class="btn btn-outline-primary">Back to Home</a>
+            </div>
+        </div>
+    </div>
+</div> 

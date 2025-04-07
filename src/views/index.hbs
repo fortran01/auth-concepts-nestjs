@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NestJS Auth Demo - Home</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding-top: 20px;
+            padding-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-10 offset-md-1">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="text-center">NestJS Authentication Concepts Demo</h2>
+                    </div>
+                    <div class="card-body">
+                        <p class="lead text-center">
+                            This application demonstrates different authentication concepts in a NestJS app.
+                        </p>
+                        
+                        <div class="row mt-4">
+                            <div class="col-md-12">
+                                <div class="card mb-4 auth-feature-card">
+                                    <div class="card-header bg-primary text-white">
+                                        <h3 class="mb-0">Basic Authentication</h3>
+                                    </div>
+                                    <div class="card-body">
+                                        <p>Demonstration of Basic Authentication with password hashing.</p>
+                                        <ul>
+                                            <li>Username/password authentication using HTTP headers</li>
+                                            <li>Password hashing with bcrypt</li>
+                                            <li>Implementation using NestJS Guards</li>
+                                            <li>Secure password storage</li>
+                                        </ul>
+                                        <div class="d-grid gap-2">
+                                            <a href="/auth/basic" class="btn btn-primary">Try Basic Authentication</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <h4>Coming Soon</h4>
+                            <p>The following authentication methods will be implemented in future updates:</p>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="card mb-3 auth-feature-card">
+                                        <div class="card-body">
+                                            <h5 class="card-title">JWT Authentication</h5>
+                                            <p class="card-text">Token-based authentication using JSON Web Tokens.</p>
+                                            <button class="btn btn-outline-secondary btn-sm" disabled>Coming Soon</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card mb-3 auth-feature-card">
+                                        <div class="card-body">
+                                            <h5 class="card-title">Session Authentication</h5>
+                                            <p class="card-text">Form-based authentication with server-side sessions.</p>
+                                            <button class="btn btn-outline-secondary btn-sm" disabled>Coming Soon</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card mb-3 auth-feature-card">
+                                        <div class="card-body">
+                                            <h5 class="card-title">OAuth 2.0 / OIDC</h5>
+                                            <p class="card-text">Authentication using third-party identity providers.</p>
+                                            <button class="btn btn-outline-secondary btn-sm" disabled>Coming Soon</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <h4>API Endpoints</h4>
+                            <p>The following API endpoints are available for testing:</p>
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Endpoint</th>
+                                            <th>Method</th>
+                                            <th>Authentication</th>
+                                            <th>Description</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><code>/</code></td>
+                                            <td>GET</td>
+                                            <td>None</td>
+                                            <td>Home page (this page)</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>/auth/basic</code></td>
+                                            <td>GET</td>
+                                            <td>Basic Auth</td>
+                                            <td>Protected endpoint using Basic Authentication</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <h4>Testing Basic Authentication</h4>
+                            <p>You can test the Basic Authentication endpoint using curl:</p>
+                            <div class="bg-light p-3 rounded">
+                                <pre>curl -v -u admin:secret http://localhost:3000/auth/basic</pre>
+                            </div>
+                            <p class="mt-2">Default credentials:</p>
+                            <ul>
+                                <li>Username: <code>admin</code></li>
+                                <li>Password: <code>secret</code></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="card-footer text-muted">
+                        <p class="mb-0 text-center">This is an educational demo. <strong>Do not use in production</strong> without proper security review.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 
