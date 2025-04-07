@@ -17,7 +17,8 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "test:auth": "jest --testPathPattern=test/auth",
+    "test:auth": "jest --testPathPattern=test/auth --testPathIgnorePatterns=\\.e2e-spec\\.ts$",
+    "test:auth:e2e": "jest --config ./test/jest-e2e.json --testPathPattern=digest-auth.e2e-spec.ts",
     "generate-hash": "node src/scripts/generate-hash.js",
     "test:digest": "node src/scripts/test-digest-auth.js"
   },

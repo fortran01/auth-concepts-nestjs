@@ -44,8 +44,11 @@ jobs:
       - name: E2E tests
         run: npm run test:e2e
 
-      - name: Auth-specific tests
+      - name: Auth-specific unit tests
         run: npm run test:auth
+
+      - name: Auth-specific E2E tests
+        run: npm run test:auth:e2e
 
   build:
     runs-on: ubuntu-latest

@@ -1,15 +1,28 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnModuleDestroy } from '@nestjs/common';
 import { randomBytes } from 'crypto';
 
+interface StoredNonce {
+  value: string;
+  expires: Date;
+}
+
 @Injectable()
-export class NonceService {
-  private readonly nonces: Set<string> = new Set();
+export class NonceService implements OnModuleDestroy {
+  private readonly nonces: Map<string, Date> = new Map();
   private readonly nonceLifetimeMs = 300000; // 5 minutes in milliseconds
   private readonly nonceCleanupIntervalMs = 60000; // 1 minute in milliseconds
+  private cleanupInterval: NodeJS.Timeout;
 
   constructor() {
     // Periodically clean up expired nonces
-    setInterval(() => this.cleanupExpiredNonces(), this.nonceCleanupIntervalMs);
+    this.cleanupInterval = setInterval(() => this.cleanupExpiredNonces(), this.nonceCleanupIntervalMs);
+  }
+
+  onModuleDestroy() {
+    // Clean up the interval when the module is destroyed
+    if (this.cleanupInterval) {
+      clearInterval(this.cleanupInterval);
+    }
   }
 
   /**
@@ -19,32 +32,61 @@ export class NonceService {
     // Generate a random nonce
     const nonce = randomBytes(16).toString('hex');
     
-    // Store the nonce with its creation timestamp
-    this.nonces.add(nonce);
+    // Calculate expiration time
+    const expires = new Date();
+    expires.setTime(expires.getTime() + this.nonceLifetimeMs);
     
-    // Store expiration time for cleanup
-    setTimeout(() => {
-      this.nonces.delete(nonce);
-    }, this.nonceLifetimeMs);
+    // Store the nonce with its expiration time
+    this.nonces.set(nonce, expires);
     
     return nonce;
   }
 
   /**
-   * Check if a nonce is valid (exists in our store)
+   * Check if a nonce is valid (exists in our store and not expired)
    */
   isValidNonce(nonce: string): boolean {
-    return this.nonces.has(nonce);
+    if (!this.nonces.has(nonce)) {
+      return false;
+    }
+    
+    const expiry = this.nonces.get(nonce);
+    const now = new Date();
+    
+    // Check if nonce has expired
+    if (now > expiry) {
+      // Clean up expired nonce
+      this.nonces.delete(nonce);
+      return false;
+    }
+    
+    return true;
   }
 
   /**
    * Clean up expired nonces
-   * (This is redundant with our setTimeout approach but provides additional safety)
    */
   private cleanupExpiredNonces(): void {
-    // With our approach using setTimeout to delete expired nonces,
-    // we don't need additional cleanup logic here, but in a production
-    // system you might want to store nonces with timestamps and clean them up
-    // based on their age.
+    const now = new Date();
+    
+    for (const [nonce, expiry] of this.nonces.entries()) {
+      if (now > expiry) {
+        this.nonces.delete(nonce);
+      }
+    }
+  }
+
+  /**
+   * Clear all nonces (primarily for testing)
+   */
+  clearNonces(): void {
+    this.nonces.clear();
+  }
+
+  /**
+   * Get the count of stored nonces (for debugging and testing)
+   */
+  getNonceCount(): number {
+    return this.nonces.size;
   }
 } 
