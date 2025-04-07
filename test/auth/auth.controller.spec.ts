@@ -3,6 +3,9 @@ import { AuthController } from '../../src/auth/auth.controller';
 import { AuthService } from '../../src/auth/auth.service';
 import { UnauthorizedException } from '@nestjs/common';
 import { Request, Response } from 'express';
+import { DigestAuthGuard } from '../../src/auth/guards/digest-auth.guard';
+import { NonceService } from '../../src/auth/nonce/nonce.service';
+import { UsersService } from '../../src/auth/users/users.service';
 
 describe('AuthController', () => {
   let controller: AuthController;
@@ -25,6 +28,20 @@ describe('AuthController', () => {
             validateUser: jest.fn(),
           }),
         },
+        {
+          provide: NonceService,
+          useFactory: () => ({
+            generateNonce: jest.fn().mockReturnValue('mock-nonce'),
+            isValidNonce: jest.fn().mockReturnValue(true),
+          }),
+        },
+        {
+          provide: UsersService,
+          useFactory: () => ({
+            findOne: jest.fn(),
+          }),
+        },
+        DigestAuthGuard,
       ],
     }).compile();
 

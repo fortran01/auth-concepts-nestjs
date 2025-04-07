@@ -1,10 +1,11 @@
 # NestJS Authentication Demo
 
-This demo shows how to implement Basic Authentication in NestJS.
+This demo shows how to implement different authentication mechanisms in NestJS.
 
 ## Features
 
 - Basic Authentication implementation with password hashing
+- Digest Authentication with nonce-based challenge-response
 
 ## Setup
 
@@ -32,6 +33,7 @@ The demo provides these endpoints:
 
 - `GET /` - Welcome page (no authentication)
 - `GET /auth/basic` - Protected by Basic Authentication
+- `GET /auth/digest` - Protected by Digest Authentication
 
 Default credentials:
 - Username: `admin`
@@ -52,11 +54,34 @@ When a request is made to a protected route:
 4. If valid, the protected resource is rendered
 5. If invalid, a 401 response is returned with the WWW-Authenticate header to prompt for credentials
 
-This direct approach ensures proper handling of the HTTP Basic Authentication protocol and browser behavior.
+## Digest Authentication Implementation
+
+The Digest Authentication implementation uses the following components:
+
+1. **NonceService** - Manages nonce generation and validation for preventing replay attacks
+2. **DigestAuthGuard** - Implements the Digest Authentication protocol as a NestJS guard
+3. **DigestAuthMiddleware** - Alternative implementation as middleware for app-wide usage
+
+Digest Authentication works as follows:
+1. The client makes a request to a protected resource
+2. The server responds with a 401 status and a WWW-Authenticate header containing a nonce
+3. The client calculates an MD5 hash of the username, realm, and password (HA1)
+4. The client calculates an MD5 hash of the HTTP method and URI (HA2)
+5. The client creates a response by hashing HA1:nonce:HA2
+6. The client sends this response along with other credentials in the Authorization header
+7. The server performs the same hash calculations and compares with the client-provided response
+8. If valid, the server grants access to the protected resource
+
+Advantages over Basic Authentication:
+- Passwords are not sent in plaintext
+- Nonce values help prevent replay attacks
+- More secure while still widely supported
 
 ## Testing
 
-You can test the Basic Authentication endpoint using curl:
+You can test the authentication endpoints using curl:
+
+### Basic Authentication
 
 ```bash
 # No credentials (should fail)
@@ -67,4 +92,11 @@ curl -v -u wrong:password http://localhost:3000/auth/basic
 
 # Valid credentials (should succeed)
 curl -v -u admin:secret http://localhost:3000/auth/basic
+```
+
+### Digest Authentication
+
+```bash
+# Using the --digest flag to handle the challenge-response flow
+curl -v --digest -u admin:secret http://localhost:3000/auth/digest
 ``` 

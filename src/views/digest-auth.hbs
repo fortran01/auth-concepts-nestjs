@@ -1,0 +1,59 @@
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h2 class="mb-0">Digest Authentication Success</h2>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-success">
+                    <h4 class="alert-heading">Authentication Successful!</h4>
+                    <p>{{message}}</p>
+                </div>
+                
+                <h4>User Information:</h4>
+                <table class="table table-striped">
+                    <tbody>
+                        <tr>
+                            <th>User ID:</th>
+                            <td>{{user.userId}}</td>
+                        </tr>
+                        <tr>
+                            <th>Username:</th>
+                            <td>{{user.username}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <h4 class="mt-4">How Digest Authentication Works:</h4>
+                <ol>
+                    <li>The client makes a request to a protected resource.</li>
+                    <li>The server responds with a 401 Unauthorized status and includes a WWW-Authenticate header with a nonce value.</li>
+                    <li>The client creates an MD5 hash of the username, realm, and password (HA1).</li>
+                    <li>The client creates an MD5 hash of the HTTP method and URI (HA2).</li>
+                    <li>The client creates a response by hashing HA1:nonce:HA2.</li>
+                    <li>The client sends this response along with other credentials in the Authorization header.</li>
+                    <li>The server performs the same hash calculations and compares with the client-provided response.</li>
+                    <li>If valid, the server grants access to the protected resource.</li>
+                </ol>
+                
+                <h4 class="mt-4">Advantages of Digest Authentication:</h4>
+                <ul>
+                    <li>Unlike Basic Authentication, passwords are not sent in plaintext.</li>
+                    <li>The use of nonce values helps prevent replay attacks.</li>
+                    <li>It's more secure than Basic Authentication but still widely supported.</li>
+                </ul>
+                
+                <h4 class="mt-4">Security Considerations:</h4>
+                <ul>
+                    <li>While more secure than Basic Authentication, Digest Authentication is still not as secure as modern methods like OAuth 2.0.</li>
+                    <li>The password is still stored on the server in a format that can be used to compute the expected response.</li>
+                    <li>For maximum security, Digest Authentication should be used over TLS/HTTPS.</li>
+                </ul>
+                
+                <div class="mt-4">
+                    <a href="/" class="btn btn-primary">Back to Home</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

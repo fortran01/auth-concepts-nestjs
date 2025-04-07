@@ -1,6 +1,15 @@
-import { Controller, Get, Req, Res } from '@nestjs/common';
+import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Request, Response } from 'express';
+import { DigestAuthGuard } from './guards/digest-auth.guard';
+
+// Define an interface to extend Express Request type
+interface RequestWithUser extends Request {
+  user: {
+    userId: number;
+    username: string;
+  };
+}
 
 @Controller('auth')
 export class AuthController {
@@ -39,5 +48,20 @@ export class AuthController {
       res.setHeader('WWW-Authenticate', 'Basic realm="Login Required"');
       return res.status(401).send();
     }
+  }
+
+  @Get('digest')
+  @UseGuards(DigestAuthGuard)
+  async getDigestProtected(@Req() req: RequestWithUser, @Res() res: Response) {
+    // The DigestAuthGuard will handle authentication
+    // If execution gets here, the user is authenticated
+    
+    const user = req.user;
+    
+    return res.render('digest-auth', {
+      title: 'Digest Auth',
+      message: `Hello ${user.username}! This page uses Digest Authentication.`,
+      user: user,
+    });
   }
 } 
