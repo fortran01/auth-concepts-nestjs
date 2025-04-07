@@ -20,7 +20,7 @@ export class AuthService {
     }
     
     // We don't want to return the password
-    const { password: _, ...result } = user;
+    const { password: _password, ...result } = user;
     return result;
   }
 } 
