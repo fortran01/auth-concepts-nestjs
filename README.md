@@ -1,11 +1,17 @@
 # NestJS Authentication Demo
 
-This demo shows how to implement different authentication mechanisms in NestJS.
+This demo shows how to implement various authentication mechanisms in NestJS.
 
 ## Features
 
 - Basic Authentication implementation with password hashing
 - Digest Authentication with nonce-based challenge-response
+- Stateful Authentication with session management
+  - Form-based authentication with user-friendly UI
+  - Server-side session storage (memory for demo, Redis-ready)
+  - Multi-Factor Authentication (MFA) with verification codes
+  - Session timeout and secure cookies
+  - Flash messages for user feedback
 
 ## Setup
 
@@ -20,7 +26,12 @@ npm install
 cp .env.example .env
 ```
 
-4. Start the application:
+4. Optional: Start Redis for persistent session storage:
+```bash
+docker-compose up -d
+```
+
+5. Start the application:
 ```bash
 npm run start:dev
 ```
@@ -34,48 +45,54 @@ The demo provides these endpoints:
 - `GET /` - Welcome page (no authentication)
 - `GET /auth/basic` - Protected by Basic Authentication
 - `GET /auth/digest` - Protected by Digest Authentication
+- `GET /auth/session/login` - Form login for session-based authentication
+- `GET /auth/session/protected` - Protected by session authentication
+- `GET /auth/session/setup-mfa` - Setup Multi-Factor Authentication
+- `GET /auth/session/verify-mfa` - Verify MFA during login
+- `GET /auth/session/logout` - Logout and destroy session
 
 Default credentials:
 - Username: `admin`
 - Password: `secret`
 
-## Basic Authentication Implementation
+## Session Authentication Implementation
 
-The Basic Authentication implementation uses the following components:
+The Stateful (Session) Authentication implementation uses the following components:
 
-1. **UsersService** - Manages user data and provides a method to find users by username
-2. **AuthService** - Validates user credentials using bcrypt for password hashing
-3. **Direct Response Handling** - Implements authentication directly in the controller with proper HTTP headers
+1. **Session Middleware** - Uses Express session middleware for managing user sessions
+2. **Passport Integration** - Uses PassportJS with local strategy for authentication
+3. **User Session Serialization** - Serializes user information for session storage
+4. **Flash Messages** - Provides user feedback on operations
+5. **MFA Support** - Adds an optional second authentication factor
 
-When a request is made to a protected route:
-1. The controller checks for the Authorization header
-2. If the header is missing or invalid, it returns a 401 status with a WWW-Authenticate header
-3. The credentials are decoded and validated against the user database
-4. If valid, the protected resource is rendered
-5. If invalid, a 401 response is returned with the WWW-Authenticate header to prompt for credentials
+When a user logs in:
+1. The local strategy validates their credentials against stored users
+2. Upon successful authentication, their session is established
+3. Session information is stored server-side
+4. Only a session ID is sent to the client as a cookie
+5. Subsequent requests are authenticated using the session cookie
+6. Sessions expire after a configurable time (1 day by default)
 
-## Digest Authentication Implementation
+### Redis Session Storage (Optional)
 
-The Digest Authentication implementation uses the following components:
+The application can be configured to use Redis for session storage:
 
-1. **NonceService** - Manages nonce generation and validation for preventing replay attacks
-2. **DigestAuthGuard** - Implements the Digest Authentication protocol as a NestJS guard
-3. **DigestAuthMiddleware** - Alternative implementation as middleware for app-wide usage
+1. Start the Redis container with `docker-compose up -d`
+2. Uncomment and configure the Redis session store in `src/main.ts`
 
-Digest Authentication works as follows:
-1. The client makes a request to a protected resource
-2. The server responds with a 401 status and a WWW-Authenticate header containing a nonce
-3. The client calculates an MD5 hash of the username, realm, and password (HA1)
-4. The client calculates an MD5 hash of the HTTP method and URI (HA2)
-5. The client creates a response by hashing HA1:nonce:HA2
-6. The client sends this response along with other credentials in the Authorization header
-7. The server performs the same hash calculations and compares with the client-provided response
-8. If valid, the server grants access to the protected resource
+Using Redis provides these advantages:
+- Sessions persist across application restarts
+- Better scalability for distributed deployments
+- Centralized session management
+- Independent session timeout control
 
-Advantages over Basic Authentication:
-- Passwords are not sent in plaintext
-- Nonce values help prevent replay attacks
-- More secure while still widely supported
+## Security Considerations
+
+- Session IDs are stored in HTTP-only cookies to prevent JavaScript access
+- Passwords are hashed with bcrypt before storage
+- Flash messages are stored server-side
+- Multi-Factor Authentication adds an additional security layer
+- Sessions can be manually invalidated via logout
 
 ## Testing
 
@@ -99,4 +116,11 @@ curl -v -u admin:secret http://localhost:3000/auth/basic
 ```bash
 # Using the --digest flag to handle the challenge-response flow
 curl -v --digest -u admin:secret http://localhost:3000/auth/digest
+```
+
+### Session Authentication
+
+Best tested through the browser interface at:
+```
+http://localhost:3000/auth/session/login
 ``` 

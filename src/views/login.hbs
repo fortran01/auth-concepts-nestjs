@@ -1,0 +1,52 @@
+<div class="row">
+    <div class="col-md-6 offset-md-3">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h3 class="mb-0">Login</h3>
+            </div>
+            <div class="card-body">
+                {{#if error}}
+                <div class="alert alert-danger">
+                    {{error}}
+                </div>
+                {{/if}}
+                
+                {{#if flash.success}}
+                <div class="alert alert-success">
+                    {{flash.success}}
+                </div>
+                {{/if}}
+                
+                {{#if flash.info}}
+                <div class="alert alert-info">
+                    {{flash.info}}
+                </div>
+                {{/if}}
+                
+                <form action="/auth/session/login" method="post">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="username" name="username" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="password" name="password" required>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">Login</button>
+                    </div>
+                </form>
+                
+                <div class="mt-3 text-center">
+                    <p class="text-muted">Default credentials:</p>
+                    <p><code>admin</code> / <code>secret</code></p>
+                </div>
+            </div>
+            <div class="card-footer text-muted">
+                <div class="d-flex justify-content-between">
+                    <a href="/" class="btn btn-outline-secondary btn-sm">← Back to Home</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

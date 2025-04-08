@@ -1,0 +1,78 @@
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h3 class="mb-0">Session Authentication</h3>
+            </div>
+            <div class="card-body">
+                {{#if flash.success}}
+                <div class="alert alert-success">
+                    {{flash.success}}
+                </div>
+                {{/if}}
+                
+                {{#if flash.info}}
+                <div class="alert alert-info">
+                    {{flash.info}}
+                </div>
+                {{/if}}
+                
+                <div class="alert alert-success">
+                    <h4>Authentication Successful!</h4>
+                    <p>{{message}}</p>
+                </div>
+                
+                <h4>Your User Information:</h4>
+                <table class="table table-striped">
+                    <tbody>
+                        <tr>
+                            <th>User ID:</th>
+                            <td>{{user.userId}}</td>
+                        </tr>
+                        <tr>
+                            <th>Username:</th>
+                            <td>{{user.username}}</td>
+                        </tr>
+                        <tr>
+                            <th>MFA Enabled:</th>
+                            <td>
+                                {{#if user.mfaEnabled}}
+                                    <span class="badge bg-success">Enabled</span>
+                                {{else}}
+                                    <span class="badge bg-secondary">Disabled</span>
+                                {{/if}}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <h4 class="mt-4">Session Authentication Features:</h4>
+                <ul>
+                    <li>Server-side session storage (Redis)</li>
+                    <li>Protection against session fixation attacks</li>
+                    <li>Secure session cookies with HTTP-only flag</li>
+                    <li>Session timeout (24 hours)</li>
+                    <li>Flash messages for user feedback</li>
+                </ul>
+                
+                <div class="mt-4">
+                    <h5>Try these actions:</h5>
+                    <div class="d-flex gap-2">
+                        <a href="/auth/session/logout" class="btn btn-danger">Logout</a>
+                        
+                        {{#if user.mfaEnabled}}
+                            <span class="btn btn-secondary disabled">MFA Already Set Up</span>
+                        {{else}}
+                            <a href="/auth/session/setup-mfa" class="btn btn-warning">Set Up MFA</a>
+                        {{/if}}
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer text-muted">
+                <div class="d-flex justify-content-between">
+                    <a href="/" class="btn btn-outline-secondary btn-sm">← Back to Home</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

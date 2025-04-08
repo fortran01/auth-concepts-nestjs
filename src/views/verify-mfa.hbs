@@ -1,0 +1,203 @@
+<div class="row">
+    <div class="col-md-6 offset-md-3">
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <h3 class="mb-0">Verify MFA</h3>
+            </div>
+            <div class="card-body">
+                {{#if flash.error}}
+                <div class="alert alert-danger">
+                    {{flash.error}}
+                </div>
+                {{/if}}
+                
+                {{#if flash.info}}
+                <div class="alert alert-info">
+                    {{flash.info}}
+                </div>
+                {{/if}}
+                
+                <div class="alert alert-info">
+                    <p><strong>Two-Factor Authentication Required</strong></p>
+                    <p>Please enter the verification code from your authenticator app.</p>
+                </div>
+                
+                <form action="/auth/session/verify-mfa" method="post">
+                    <div class="mb-3">
+                        <label for="token" class="form-label">Verification Code</label>
+                        <input type="text" class="form-control" id="token" name="token" pattern="[0-9]{6}" placeholder="Enter 6-digit code" required autofocus>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-warning">Verify</button>
+                    </div>
+                </form>
+                
+                <div class="mt-4">
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h5>Demo Help</h5>
+                            <p>You must enter a valid TOTP code from an authenticator app.</p>
+                            <p>If you're using the demo QR code from setup, you can use the code below:</p>
+                            
+                            <div id="totp-demo" class="d-none">
+                                <div class="alert alert-dark text-center">
+                                    <div id="error-message" class="alert alert-danger d-none"></div>
+                                    <h2 id="totp" class="mb-0">Loading...</h2>
+                                    <small class="text-muted">Refreshes every 30 seconds</small>
+                                </div>
+                            </div>
+                            
+                            <div class="text-center">
+                                <button id="show-demo" class="btn btn-primary btn-sm">Show Demo TOTP Generator</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer text-muted">
+                <div class="d-flex justify-content-between">
+                    <a href="/auth/session/logout" class="btn btn-outline-secondary btn-sm">Cancel</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/jssha@3.3.1/dist/sha.min.js"></script>
+<script>
+// Get user secret via API endpoint
+document.getElementById('show-demo').addEventListener('click', function() {
+    fetch('/auth/session/get-mfa-secret')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.secret) {
+                document.getElementById('show-demo').classList.add('d-none');
+                document.getElementById('totp-demo').classList.remove('d-none');
+                startTOTPGenerator(data.secret);
+            } else {
+                throw new Error('No secret available');
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching MFA secret:', error);
+            const errorDiv = document.getElementById('error-message');
+            if (errorDiv) {
+                errorDiv.textContent = 'Error: ' + error.message;
+                errorDiv.classList.remove('d-none');
+            }
+        });
+});
+
+// TOTP implementation for demo purposes
+function generateTOTP(secret) {
+    try {
+        // Get current 30-second counter
+        let epoch = Math.floor(Date.now() / 1000);
+        let counter = Math.floor(epoch / 30);
+        
+        // Convert counter to bytes
+        let counterBytes = new Uint8Array(8);
+        for (let i = 7; i >= 0; i--) {
+            counterBytes[i] = counter & 0xff;
+            counter = counter >> 8;
+        }
+        
+        // Base32 decode the secret
+        let base32chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+        let bits = '';
+        for (let i = 0; i < secret.length; i++) {
+            let val = base32chars.indexOf(secret[i].toUpperCase());
+            if (val === -1) throw new Error('Invalid base32 character in secret');
+            bits += val.toString(2).padStart(5, '0');
+        }
+        
+        // Ensure we have complete bytes
+        bits = bits.slice(0, Math.floor(bits.length / 8) * 8);
+        if (bits.length === 0) throw new Error('Secret too short');
+        
+        let secretBytes = new Uint8Array(bits.match(/.{8}/g).map(b => parseInt(b, 2)));
+        
+        // Calculate HMAC-SHA1
+        let shaObj = new jsSHA("SHA-1", "UINT8ARRAY", { encoding: "UTF8" });
+        shaObj.setHMACKey(secretBytes, "UINT8ARRAY");
+        shaObj.update(counterBytes);
+        let hmac = shaObj.getHMAC("UINT8ARRAY");
+        
+        // Get offset and truncate
+        let offset = hmac[hmac.length - 1] & 0xf;
+        let code = ((hmac[offset] & 0x7f) << 24) |
+                   ((hmac[offset + 1] & 0xff) << 16) |
+                   ((hmac[offset + 2] & 0xff) << 8) |
+                   (hmac[offset + 3] & 0xff);
+        
+        // Get 6 digits
+        return (code % 1000000).toString().padStart(6, '0');
+    } catch (error) {
+        console.error('TOTP generation error:', error);
+        const errorDiv = document.getElementById('error-message');
+        if (errorDiv) {
+            errorDiv.textContent = 'Error generating TOTP code: ' + error.message;
+            errorDiv.classList.remove('d-none');
+        }
+        return '------';
+    }
+}
+
+// Update TOTP code every second
+function startTOTPGenerator(secret) {
+    let timerInterval;
+    let errorShown = false;
+    
+    function updateTOTP() {
+        try {
+            let epoch = Math.floor(Date.now() / 1000);
+            let timeLeft = 30 - (epoch % 30);
+            let code = generateTOTP(secret);
+            
+            const errorDiv = document.getElementById('error-message');
+            const totpDiv = document.getElementById('totp');
+            
+            if (!errorDiv || !totpDiv) {
+                console.error('Required elements not found');
+                return;
+            }
+            
+            if (code !== '------') {
+                errorDiv.classList.add('d-none');
+                errorShown = false;
+            }
+            
+            totpDiv.textContent = `${code} (${timeLeft}s)`;
+        } catch (error) {
+            if (!errorShown) {
+                console.error('Update error:', error);
+                const errorDiv = document.getElementById('error-message');
+                if (errorDiv) {
+                    errorDiv.textContent = 'Error updating TOTP code: ' + error.message;
+                    errorDiv.classList.remove('d-none');
+                }
+                errorShown = true;
+            }
+        }
+    }
+    
+    // Check if the jssha library is loaded
+    if (typeof jsSHA === 'undefined') {
+        const errorDiv = document.getElementById('error-message');
+        if (errorDiv) {
+            errorDiv.textContent = 'Error: Required library failed to load. Please refresh the page.';
+            errorDiv.classList.remove('d-none');
+        }
+        return;
+    }
+    
+    // Initialize and start updates
+    updateTOTP();
+    timerInterval = setInterval(updateTOTP, 1000);
+}
+</script> 
