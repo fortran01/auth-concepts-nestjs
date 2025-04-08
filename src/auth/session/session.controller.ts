@@ -3,6 +3,7 @@ import { Request, Response } from 'express';
 import { LocalAuthGuard } from './local-auth.guard';
 import { SessionGuard } from './session.guard';
 import { SessionService } from './session.service';
+import * as QRCode from 'qrcode';
 
 // Add a declaration to enhance Express Request
 declare module 'express-serve-static-core' {
@@ -106,6 +107,10 @@ export class SessionController {
       req.session.temp_mfa_secret = secret;
     }
     
+    // Generate QR code data URL
+    const otpauthUrl = `otpauth://totp/NestJS%20Auth%20Demo:${req.user.username || 'user'}?secret=${secret}&issuer=NestJS%20Auth%20Demo`;
+    const qrCodeDataUrl = await QRCode.toDataURL(otpauthUrl);
+    
     // Add flash messages to template data
     const flash = {
       success: req.flash ? req.flash('success') : [],
@@ -116,6 +121,7 @@ export class SessionController {
     return res.render('setup-mfa', {
       title: 'Setup MFA',
       secret,
+      qrCodeDataUrl,
       flash,
     });
   }
