@@ -1,0 +1,72 @@
+<div class="row">
+    <div class="col-md-6 offset-md-3">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h2>LDAP Authentication</h2>
+            </div>
+            <div class="card-body">
+                <p class="lead">
+                    This page demonstrates direct LDAP authentication. Enter your LDAP credentials to log in.
+                </p>
+
+                {{#if error}}
+                <div class="alert alert-danger" role="alert">
+                    <strong>Authentication Error:</strong> {{error}}
+                </div>
+                {{/if}}
+
+                <div class="mb-4">
+                    <h4>How LDAP Authentication Works</h4>
+                    <ul>
+                        <li>Your credentials are sent directly to the LDAP server</li>
+                        <li>Authentication is performed by binding to your user DN with your password</li>
+                        <li>No password storage in the application</li>
+                        <li>LDAP attributes are retrieved to display in the protected page</li>
+                    </ul>
+                </div>
+
+                <form action="/auth/ldap/login" method="POST">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Username (uid)</label>
+                        <input type="text" class="form-control" id="username" name="username" placeholder="e.g., john.doe" required>
+                        <div class="form-text">Enter your LDAP username (uid)</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="password" name="password" required>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">Log In</button>
+                    </div>
+                </form>
+
+                <div class="mt-4">
+                    <h5>Available Test Users</h5>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Username (uid)</th>
+                                    <th>Password</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>john.doe</code></td>
+                                    <td><code>password123</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>jane.smith</code></td>
+                                    <td><code>password456</code></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <a href="/" class="btn btn-outline-secondary">Back to Home</a>
+            </div>
+        </div>
+    </div>
+</div> 

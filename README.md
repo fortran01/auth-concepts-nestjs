@@ -17,6 +17,11 @@ This demo shows how to implement various authentication mechanisms in NestJS.
   - JWT (JSON Web Tokens) for secure, self-contained claims
   - Client-side token storage using browser localStorage
   - Authorization header for API requests
+- LDAP Authentication
+  - Direct binding to LDAP server for authentication
+  - LDAP user attribute retrieval
+  - No password storage in application
+  - Includes OpenLDAP server in Docker for testing
 - Cross-Origin Resource Sharing (CORS) Demo
   - Demonstrates browser's Same-Origin Policy
   - Shows how CORS headers enable controlled cross-origin access
@@ -41,12 +46,17 @@ npm install
 cp .env.example .env
 ```
 
-4. Optional: Start Redis for persistent session storage:
+4. Start Docker containers (Redis and OpenLDAP):
 ```bash
 docker-compose up -d
 ```
 
-5. Start the application:
+5. Initialize LDAP test users:
+```bash
+npm run setup-ldap
+```
+
+6. Start the application:
 ```bash
 npm run start:dev
 ```
@@ -60,6 +70,8 @@ The demo provides these endpoints:
 - `GET /` - Welcome page (no authentication)
 - `GET /auth/basic` - Protected by Basic Authentication
 - `GET /auth/digest` - Protected by Digest Authentication
+- `GET /auth/ldap` - LDAP Authentication login form
+- `POST /auth/ldap/login` - LDAP Authentication endpoint
 - `GET /auth/session/login` - Form login for session-based authentication
 - `GET /auth/session/protected` - Protected by session authentication
 - `GET /auth/session/setup-mfa` - Setup Multi-Factor Authentication
@@ -87,6 +99,15 @@ The demo provides these endpoints:
 Default credentials:
 - Username: `admin`
 - Password: `secret`
+
+LDAP test credentials:
+- Username: `john.doe`
+- Password: `password123`
+
+or
+
+- Username: `jane.smith`
+- Password: `password456`
 
 ## Session Authentication Implementation
 
@@ -240,6 +261,24 @@ curl -v -H "Cookie: $COOKIE" http://localhost:3000/auth/session/logout
 ```
 
 Note: For MFA-enabled accounts, additional steps are required to complete authentication. 
+
+### LDAP Authentication
+
+LDAP Authentication is best tested through the browser interface at:
+```
+http://localhost:3000/auth/ldap
+```
+
+You can also test programmatically using curl for the POST endpoint:
+
+```bash
+# Test LDAP login with curl
+curl -v -X POST http://localhost:3000/auth/ldap/login \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "username=john.doe&password=password123"
+```
+
+Note: The full HTML response will be returned as LDAP authentication renders pages server-side.
 
 ## Stateless Authentication Implementation
 
@@ -454,3 +493,64 @@ Each scenario in the demo shows a different aspect of CORS:
 5. **Scenario 5** - Complete CORS configuration: Shows a comprehensive set of CORS headers including credentials support
 
 For deeper understanding, open your browser's Developer Tools and observe the Network tab while using the demo to see how CORS headers affect the requests. 
+
+## LDAP Authentication
+
+This demo includes a direct LDAP authentication method that authenticates users against an OpenLDAP server.
+
+### How it works
+
+1. User submits their username and password through a form
+2. The application attempts to bind to the LDAP server using the user's credentials
+3. If the binding is successful, the user is authenticated
+4. The application retrieves the user's LDAP attributes and displays them
+
+### Setup
+
+1. Start the Docker containers which include OpenLDAP:
+
+```bash
+docker-compose up -d
+```
+
+2. Initialize the LDAP directory with test users:
+
+```bash
+npm run setup-ldap
+```
+
+3. Access the LDAP authentication demo at `/auth/ldap`
+
+### Test Users
+
+The following test users are created in the LDAP directory:
+
+| Username | Password |
+|----------|----------|
+| john.doe | password123 |
+| jane.smith | password456 |
+
+### LDAP Admin Interface
+
+The demo also includes phpLDAPadmin, a web-based LDAP client to browse and manage the LDAP directory.
+
+- Access URL: http://localhost:8090
+- Login DN: `cn=admin,dc=example,dc=org`
+- Password: `admin_password`
+
+### Implementation Details
+
+The LDAP authentication implementation uses these key components:
+
+1. **LdapService**: Handles LDAP connection, binding and directory operations
+2. **LdapController**: Manages the authentication flow and rendering templates
+3. **Docker-based LDAP Server**: Provides a fully functional OpenLDAP server for testing
+4. **phpLDAPadmin**: Offers a web interface for LDAP directory management
+
+### Security Considerations
+
+- No passwords are stored in the application; authentication is delegated to the LDAP server
+- In production environments, always use LDAPS (LDAP over SSL/TLS) to encrypt credentials
+- Use service accounts with least privilege for directory operations
+- Implement rate limiting to prevent brute force attacks
+- Apply proper error handling to avoid information disclosure 

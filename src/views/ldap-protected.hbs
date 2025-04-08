@@ -1,0 +1,90 @@
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h2>LDAP Authentication Successful</h2>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-success" role="alert">
+                    <h4 class="alert-heading">Authentication Successful!</h4>
+                    <p>{{message}}</p>
+                    <hr>
+                    <p class="mb-0">You have been authenticated directly against the LDAP server.</p>
+                </div>
+
+                <div class="my-4">
+                    <h4>How LDAP Authentication Works</h4>
+                    <p>This implementation uses direct authentication with an LDAP server:</p>
+                    <ol>
+                        <li>Your credentials were sent to the application</li>
+                        <li>The application attempted to bind to the LDAP server using your user DN and password</li>
+                        <li>If the bind was successful, your LDAP attributes were retrieved</li>
+                        <li>Your credentials were never stored in the application</li>
+                    </ol>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-header bg-info text-white">
+                        <h4 class="mb-0">Your LDAP User Information</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <tbody>
+                                    <tr>
+                                        <th>Distinguished Name (DN)</th>
+                                        <td>{{user.dn}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Username (uid)</th>
+                                        <td>{{user.uid}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Full Name (cn)</th>
+                                        <td>{{user.cn}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>First Name</th>
+                                        <td>{{user.givenName}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Last Name</th>
+                                        <td>{{user.sn}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Email</th>
+                                        <td>{{user.mail}}</td>
+                                    </tr>
+                                    {{#if user.title}}
+                                    <tr>
+                                        <th>Title</th>
+                                        <td>{{user.title}}</td>
+                                    </tr>
+                                    {{/if}}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-header bg-light">
+                        <h4 class="mb-0">LDAP Authentication Security Considerations</h4>
+                    </div>
+                    <div class="card-body">
+                        <ul>
+                            <li><strong>Transport Security:</strong> In a production environment, always use LDAPS (LDAP over SSL/TLS) to encrypt credentials in transit.</li>
+                            <li><strong>Connection Pooling:</strong> For production, implement connection pooling to improve performance.</li>
+                            <li><strong>Least Privilege:</strong> Use service accounts with minimal necessary permissions for directory operations.</li>
+                            <li><strong>Rate Limiting:</strong> Implement rate limiting to prevent brute force attacks.</li>
+                            <li><strong>Logging:</strong> Maintain detailed logs of authentication attempts for security monitoring.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <a href="/" class="btn btn-outline-secondary">Back to Home</a>
+            </div>
+        </div>
+    </div>
+</div> 

@@ -11,5 +11,36 @@ services:
     command: redis-server --appendonly yes
     restart: unless-stopped
 
+  openldap:
+    image: osixia/openldap:1.5.0
+    container_name: nestjs_auth_ldap
+    ports:
+      - "10489:389"
+      - "10637:636"
+    environment:
+      LDAP_ORGANISATION: "Example Inc."
+      LDAP_DOMAIN: "example.org"
+      LDAP_ADMIN_PASSWORD: "admin_password"
+      LDAP_CONFIG_PASSWORD: "config_password"
+      LDAP_TLS: "false"
+    volumes:
+      - ldap_data:/var/lib/ldap
+      - ldap_config:/etc/ldap/slapd.d
+    restart: unless-stopped
+
+  phpldapadmin:
+    image: osixia/phpldapadmin:0.9.0
+    container_name: nestjs_auth_ldapadmin
+    ports:
+      - "8090:80"
+    environment:
+      PHPLDAPADMIN_LDAP_HOSTS: "openldap"
+      PHPLDAPADMIN_HTTPS: "false"
+    depends_on:
+      - openldap
+    restart: unless-stopped
+
 volumes:
-  redis_data: 
+  redis_data:
+  ldap_data:
+  ldap_config: 

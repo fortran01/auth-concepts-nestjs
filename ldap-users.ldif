@@ -1,0 +1,29 @@
+dn: ou=People,dc=example,dc=org
+objectClass: organizationalUnit
+ou: People
+
+dn: uid=john.doe,ou=People,dc=example,dc=org
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+uid: john.doe
+cn: John Doe
+sn: Doe
+givenName: John
+mail: john.doe@example.org
+title: Software Engineer
+userPassword: password123
+
+dn: uid=jane.smith,ou=People,dc=example,dc=org
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+uid: jane.smith
+cn: Jane Smith
+sn: Smith
+givenName: Jane
+mail: jane.smith@example.org
+title: Product Manager
+userPassword: password456 

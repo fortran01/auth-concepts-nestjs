@@ -10,12 +10,14 @@ import { SessionSerializer } from './session/session.serializer';
 import { TokenModule } from './token/token.module';
 import { SessionController } from './session/session.controller';
 import { SessionService } from './session/session.service';
+import { LdapModule } from './ldap/ldap.module';
 
 @Module({
   imports: [
     NonceModule,
     PassportModule.register({ session: true }),
     TokenModule,
+    LdapModule,
   ],
   providers: [
     AuthService, 
