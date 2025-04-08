@@ -1,5 +1,6 @@
-import { Controller, Get, Render } from '@nestjs/common';
+import { Controller, Get, Render, Req } from '@nestjs/common';
 import { AppService } from './app.service';
+import { Request } from 'express';
 
 @Controller()
 export class AppController {
@@ -7,17 +8,21 @@ export class AppController {
 
   @Get()
   @Render('index')
-  getIndex() {
+  getIndex(@Req() req: Request) {
     return {
-      title: 'Home'
+      title: 'Home',
+      // Make flash messages available to the template
+      flash: req.session['flash']
     };
   }
   
   @Get('debug-tools')
   @Render('debug-tools')
-  getDebugTools() {
+  getDebugTools(@Req() req: Request) {
     return {
-      title: 'Debug Tools'
+      title: 'Debug Tools',
+      // Make flash messages available to the template
+      flash: req.session['flash']
     };
   }
 } 

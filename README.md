@@ -22,6 +22,11 @@ This demo shows how to implement various authentication mechanisms in NestJS.
   - Shows how CORS headers enable controlled cross-origin access
   - Illustrates various CORS configurations
   - Displays preflight requests in action
+- Cross-Site Request Forgery (CSRF) Protection Demo
+  - Demonstrates how CSRF attacks work
+  - Shows vulnerable and protected implementations
+  - Explains CSRF token-based protection
+  - Includes a simulated malicious site for testing
 
 ## Setup
 
@@ -72,6 +77,12 @@ The demo provides these endpoints:
 - `GET /api/data-with-preflight` - API endpoint that handles preflight requests
 - `GET /api/data-with-nest-cors` - API endpoint with NestJS built-in CORS support
 - `GET /debug/redis-session` - Debug tool for Redis session store (development only)
+- `GET /csrf-demo` - CSRF vulnerability and protection demo
+- `GET /csrf-demo/profile` - User profile page vulnerable to CSRF
+- `POST /csrf-demo/update-email` - Vulnerable endpoint to update email
+- `GET /csrf-demo/profile-protected` - User profile page protected against CSRF
+- `POST /csrf-demo/update-email-protected` - Protected endpoint to update email
+- `GET /csrf-demo/malicious-site` - Simulated malicious site for CSRF attacks
 
 Default credentials:
 - Username: `admin`
@@ -144,6 +155,35 @@ This tool provides the following features:
 - Troubleshoot authentication issues
 
 Note: This endpoint should be disabled or protected in production environments.
+
+## CSRF Protection
+
+The Cross-Site Request Forgery (CSRF) protection implementation demonstrates:
+
+1. **How CSRF Attacks Work** - Shows how malicious sites can trick users into submitting unwanted requests
+2. **Token-Based Protection** - Implements CSRF tokens to validate request authenticity
+3. **Session Integration** - Tokens are stored in user sessions and validated on form submission
+4. **Middleware Approach** - Uses NestJS middleware for validating CSRF tokens
+
+### CSRF Demo Components
+
+The CSRF demo includes these components:
+
+1. **Vulnerable Profile Page** - Shows a form without CSRF protection
+2. **Protected Profile Page** - Shows the same form with CSRF protection
+3. **Malicious Site Simulator** - Demonstrates a third-party site that attempts to exploit the vulnerability
+4. **CSRF Service** - Generates and validates CSRF tokens
+5. **CSRF Middleware** - Automatically checks for valid tokens on protected endpoints
+
+### Testing the CSRF Demo
+
+The best way to test the CSRF protection is through the browser:
+
+1. Visit the CSRF demo page: `http://localhost:3001/csrf-demo`
+2. Visit the vulnerable profile page and note your current email address
+3. In a new tab, visit the malicious site
+4. Return to the vulnerable profile page and notice your email has been changed without consent
+5. Try the same with the protected profile page - the attack will fail
 
 ## Security Considerations
 

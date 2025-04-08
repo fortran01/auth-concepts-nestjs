@@ -1,0 +1,115 @@
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        <h3>Cross-Site Request Forgery (CSRF) Demo</h3>
+    </div>
+    <div class="card-body">
+        <h4>What is CSRF?</h4>
+        <p>
+            Cross-Site Request Forgery (CSRF) is an attack that forces authenticated users to submit a request to a web application 
+            against which they are currently authenticated. This is done without the user's knowledge or consent.
+        </p>
+        
+        <h4>How Does it Work?</h4>
+        <p>
+            CSRF attacks exploit the trust that a web application has in a user's browser. When a user is authenticated to a website, 
+            their browser typically includes authentication information (like cookies) with every request to that site. If an attacker can trick 
+            the user into making a request to that site, the authentication information will be included automatically.
+        </p>
+        
+        <h4>The Demo</h4>
+        <p>
+            In this demo, we have created two variations of a user profile page:
+        </p>
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-header bg-danger text-white">
+                        <h5>Vulnerable Page</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>This page has a form to update your email address, but it's vulnerable to CSRF attacks.</p>
+                        <a href="/csrf-demo/profile" class="btn btn-danger">View Vulnerable Page</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-header bg-success text-white">
+                        <h5>Protected Page</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>This page has a form to update your username, and it's protected against CSRF attacks using an anti-CSRF token.</p>
+                        <a href="/csrf-demo/profile-protected" class="btn btn-success">View Protected Page</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mb-4">
+            <div class="card-header bg-warning text-dark">
+                <h5>Malicious Sites</h5>
+            </div>
+            <div class="card-body">
+                <p>
+                    These pages simulate malicious websites that attempt to exploit a CSRF vulnerability.
+                    Each malicious site targets a different profile page, so you can clearly see the difference in outcomes.
+                </p>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header bg-danger">
+                                <h6 class="mb-0 text-white">Attacks Vulnerable Page</h6>
+                            </div>
+                            <div class="card-body">
+                                <p>This malicious site targets the page without CSRF protection.</p>
+                                <a href="/csrf-demo/malicious-site" class="btn btn-outline-danger" target="_blank">Visit Malicious Site A</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header bg-success">
+                                <h6 class="mb-0 text-white">Attacks Protected Page</h6>
+                            </div>
+                            <div class="card-body">
+                                <p>This malicious site targets the page with CSRF protection.</p>
+                                <a href="/csrf-demo/malicious-site-protected" class="btn btn-outline-success" target="_blank">Visit Malicious Site B</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <h4>How to Test the Demo</h4>
+        <ol>
+            <li>Visit the <a href="/csrf-demo/profile">Vulnerable Profile Page</a> and note your current email address.</li>
+            <li>Visit the <a href="/csrf-demo/profile-protected">Protected Profile Page</a> and note your current username.</li>
+            <li>In a new tab, visit <a href="/csrf-demo/malicious-site" target="_blank">Malicious Site A</a> that targets the vulnerable page.</li>
+            <li>Return to the Vulnerable Profile Page and notice that your email has been changed without your explicit consent.</li>
+            <li>Now, visit <a href="/csrf-demo/malicious-site-protected" target="_blank">Malicious Site B</a> that targets the protected page.</li>
+            <li>Return to the Protected Profile Page and verify that your username remains unchanged, with an attack notification displayed.</li>
+        </ol>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header bg-info text-white">
+        <h3>Protection Mechanism Explained</h3>
+    </div>
+    <div class="card-body">
+        <p>
+            The protected page uses an anti-CSRF token, which is a unique, unpredictable value that is included in the form. 
+            This token is also stored in the user's session on the server. When the form is submitted, the server verifies that 
+            the token in the form matches the one in the session.
+        </p>
+        <p>
+            The malicious site cannot know or guess this token, so it cannot include it in its forged request. 
+            This prevents the CSRF attack.
+        </p>
+        <p>
+            When using NestJS or other modern web frameworks, CSRF protection middleware is often available. 
+            In NestJS, for example, you can implement custom middleware to validate CSRF tokens.
+        </p>
+    </div>
+</div> 

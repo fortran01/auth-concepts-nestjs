@@ -1,0 +1,99 @@
+<div class="card mb-4">
+    <div class="card-header bg-success text-white">
+        <h3>User Profile (Protected from CSRF)</h3>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-success">
+            <strong>Note:</strong> This page is protected against CSRF attacks using an anti-CSRF token.
+        </div>
+        
+        {{#if attackAttempted}}
+        <div class="alert alert-warning">
+            <strong>Attack Detected!</strong> A CSRF attack was attempted but blocked by the protection mechanism. 
+            Your information is safe because the request did not include a valid CSRF token.
+        </div>
+        {{/if}}
+        
+        <h4>Welcome User!</h4>
+        <p>Your email address is: <strong>{{email}}</strong></p>
+        <p>Your username is: <strong>{{username}}</strong></p>
+        
+        {{#if flash.success}}
+            {{#each flash.success}}
+                <div class="alert alert-success">{{this}}</div>
+            {{/each}}
+        {{/if}}
+
+        {{#if flash.danger}}
+            {{#each flash.danger}}
+                <div class="alert alert-danger">{{this}}</div>
+            {{/each}}
+        {{/if}}
+        
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5>Update Username</h5>
+            </div>
+            <div class="card-body">
+                <form action="/csrf-demo/update-username-protected" method="POST">
+                    <div class="form-group">
+                        <label for="username">New Username:</label>
+                        <input type="text" class="form-control" id="username" name="username" value="{{username}}" required>
+                    </div>
+                    <!-- CSRF Protection: Hidden field with the CSRF token -->
+                    <input type="hidden" name="csrf_token" value="{{csrfToken}}">
+                    <button type="submit" class="btn btn-primary mt-3">Update Username</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header bg-info text-white">
+        <h3>Protection Explanation</h3>
+    </div>
+    <div class="card-body">
+        <p>
+            This page is <strong>protected against CSRF attacks</strong> using an anti-CSRF token. 
+            Notice the hidden field in the form:
+        </p>
+        <pre><code>&lt;input type="hidden" name="csrf_token" value="{{csrfToken}}"&gt;</code></pre>
+        <p>
+            When the form is submitted, the server verifies that the token in the form matches the one in the session.
+            This prevents CSRF attacks because a malicious site cannot know or guess this token.
+        </p>
+        <p>
+            Try visiting the <a href="/csrf-demo/malicious-site-protected" target="_blank">malicious site</a> now. 
+            Your username will not be changed because the forged request does not include a valid CSRF token.
+        </p>
+        <p>
+            To see the vulnerable version of this page, visit the 
+            <a href="/csrf-demo/profile">unprotected version</a>.
+        </p>
+        <p>
+            <a href="/csrf-demo" class="btn btn-info">Back to CSRF Demo</a>
+        </p>
+    </div>
+</div>
+
+<div class="card mt-4">
+    <div class="card-header bg-secondary text-white">
+        <h3>CSRF Token Details</h3>
+    </div>
+    <div class="card-body">
+        <h4>Current CSRF Token</h4>
+        <p>For educational purposes only, here is your current CSRF token:</p>
+        <div class="alert alert-secondary">
+            <code>{{csrfToken}}</code>
+        </div>
+        <p>
+            This token is unique to your session and changes periodically. It is stored in your session on the server
+            and is also embedded in the form as a hidden field. When the form is submitted, the server checks that the
+            token in the form matches the one in your session.
+        </p>
+        <p>
+            In a real application, you would never display this token to the user, but we show it here for educational purposes.
+        </p>
+    </div>
+</div> 

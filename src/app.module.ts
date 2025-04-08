@@ -5,6 +5,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { DebugModule } from './debug/debug.module';
 import { CorsModule } from './cors/cors.module';
+import { CsrfModule } from './csrf/csrf.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { CorsModule } from './cors/cors.module';
     AuthModule,
     DebugModule,
     CorsModule,
+    CsrfModule,
   ],
   controllers: [AppController],
   providers: [AppService],
