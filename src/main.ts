@@ -7,6 +7,7 @@ import * as session from 'express-session';
 import * as passport from 'passport';
 import { createClient } from 'redis';
 import * as cookieParser from 'cookie-parser';
+import * as hbs from 'hbs';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -15,6 +16,13 @@ async function bootstrap() {
   // This works in both development and production
   const viewsPath = join(process.cwd(), 'src/views');
   console.log('Views directory path:', viewsPath);
+  
+  // Determine the path to the partials directory
+  const partialsPath = join(process.cwd(), 'src/views/partials');
+  console.log('Partials directory path:', partialsPath);
+  
+  // Register partials directory
+  hbs.registerPartials(partialsPath);
   
   // Set up template engine
   app.setBaseViewsDir(viewsPath);

@@ -1,0 +1,201 @@
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h2>Token Protected Page</h2>
+            </div>
+            <div class="card-body">
+                <div id="loading" class="text-center">
+                    <div class="spinner-border text-success" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2">Verifying authentication...</p>
+                </div>
+
+                {{#if error}}
+                <div class="alert alert-danger">
+                    <p><strong>Authentication Error!</strong></p>
+                    <p>{{error}}</p>
+                    <p>Please <a href="/token/login">login again</a> to get a new token.</p>
+                </div>
+                {{/if}}
+                
+                <div id="content" class="d-none">
+                    <p class="lead" id="welcome-message">{{message}}</p>
+                    
+                    <div class="alert alert-info">
+                        <p><strong>About Stateless Authentication:</strong></p>
+                        <p>This page is protected by JWT token authentication. Key points:</p>
+                        <ul>
+                            <li>Your JWT token is sent in the Authorization header with each request</li>
+                            <li>The server verifies the token's signature to validate you</li>
+                            <li>No server-side session state is stored</li>
+                            <li>All user context is contained in the token itself</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h4>User Information</h4>
+                        </div>
+                        <div class="card-body">
+                            <dl class="row">
+                                <dt class="col-sm-3">User ID</dt>
+                                <dd class="col-sm-9" id="user-id">{{#if user}}{{user.userId}}{{/if}}</dd>
+                                
+                                <dt class="col-sm-3">Username</dt>
+                                <dd class="col-sm-9" id="username">{{#if user}}{{user.username}}{{/if}}</dd>
+                            </dl>
+                        </div>
+                    </div>
+                    
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h4>API Data Demo</h4>
+                        </div>
+                        <div class="card-body">
+                            <p>This demonstrates using your JWT token to make authenticated API calls:</p>
+                            <button id="fetch-data-btn" class="btn btn-primary mb-3">Fetch API Data</button>
+                            
+                            <div id="api-result" class="d-none">
+                                <div class="alert alert-success">
+                                    <h5>API Response:</h5>
+                                    <pre id="api-response" class="border rounded p-3 bg-light"></pre>
+                                </div>
+                            </div>
+                            
+                            <div id="api-error" class="alert alert-danger d-none">
+                                <p><strong>API Error!</strong></p>
+                                <p id="error-message">Failed to fetch data from API.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <a href="/token/login" class="btn btn-secondary">Back to Login</a>
+                    <button id="logout-btn" class="btn btn-danger ms-2">Logout</button>
+                </div>
+
+                <div id="auth-error" class="d-none">
+                    <div class="alert alert-danger mt-3">
+                        <p><strong>Authentication Error!</strong></p>
+                        <p>No valid token found. Please log in to access this page.</p>
+                        <a href="/token/login" class="btn btn-primary mt-2">Go to Login</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const token = localStorage.getItem('jwt_token');
+        const loading = document.getElementById('loading');
+        const content = document.getElementById('content');
+        const authError = document.getElementById('auth-error');
+        const welcomeMessage = document.getElementById('welcome-message');
+        const userId = document.getElementById('user-id');
+        const username = document.getElementById('username');
+
+        // Check if already authenticated on the server side
+        const hasServerAuth = {{#if user}}true{{else}}false{{/if}};
+        
+        // Handle authentication
+        async function checkAuth() {
+            if (hasServerAuth) {
+                // Already authenticated on server side
+                loading.classList.add('d-none');
+                content.classList.remove('d-none');
+                return;
+            }
+
+            if (!token) {
+                // No token found
+                loading.classList.add('d-none');
+                authError.classList.remove('d-none');
+                return;
+            }
+
+            try {
+                // Try to fetch user data with token
+                const response = await fetch('/token/data', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to authenticate');
+                }
+
+                const data = await response.json();
+                
+                // Update UI with user data
+                welcomeMessage.textContent = `Hello ${data.user.username}! This page is protected by JWT token authentication.`;
+                userId.textContent = data.user.userId;
+                username.textContent = data.user.username;
+                
+                // Show content
+                loading.classList.add('d-none');
+                content.classList.remove('d-none');
+            } catch (error) {
+                console.error('Authentication error:', error);
+                loading.classList.add('d-none');
+                authError.classList.remove('d-none');
+                
+                // Clear invalid token
+                localStorage.removeItem('jwt_token');
+            }
+        }
+
+        // Check authentication
+        checkAuth();
+        
+        // Fetch API data
+        document.getElementById('fetch-data-btn')?.addEventListener('click', async function() {
+            try {
+                const token = localStorage.getItem('jwt_token');
+                
+                if (!token) {
+                    throw new Error('No token found. Please log in again.');
+                }
+                
+                const response = await fetch('/token/data', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error('API request failed');
+                }
+                
+                const data = await response.json();
+                
+                // Display the result
+                document.getElementById('api-response').textContent = JSON.stringify(data, null, 2);
+                document.getElementById('api-result').classList.remove('d-none');
+                document.getElementById('api-error').classList.add('d-none');
+            } catch (error) {
+                console.error('API error:', error);
+                document.getElementById('api-error').classList.remove('d-none');
+                document.getElementById('error-message').textContent = error.message || 'Failed to fetch data from API.';
+                document.getElementById('api-result').classList.add('d-none');
+                
+                // If token is invalid, redirect to login
+                if (error.message.includes('token')) {
+                    setTimeout(() => {
+                        localStorage.removeItem('jwt_token');
+                        window.location.href = '/token/login';
+                    }, 2000);
+                }
+            }
+        });
+        
+        // Handle logout
+        document.getElementById('logout-btn')?.addEventListener('click', function() {
+            localStorage.removeItem('jwt_token');
+            window.location.href = '/token/login';
+        });
+    });
+</script> 

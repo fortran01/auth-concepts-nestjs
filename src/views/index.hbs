@@ -72,21 +72,32 @@
                             </div>
                         </div>
                     </div>
+                    
+                    <div class="col-md-6">
+                        <div class="card mb-4 auth-feature-card">
+                            <div class="card-header bg-success text-white">
+                                <h3 class="mb-0">Stateless Authentication</h3>
+                            </div>
+                            <div class="card-body">
+                                <p>Demonstration of JWT token-based authentication.</p>
+                                <ul>
+                                    <li>All session data stored in token</li>
+                                    <li>Token stored in browser's localStorage</li>
+                                    <li>Server is stateless</li>
+                                    <li>Client-side token management</li>
+                                </ul>
+                                <div class="d-grid gap-2">
+                                    <a href="/token/login" class="btn btn-success">Try Token Authentication</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 
                 <div class="mt-4">
                     <h4>Coming Soon</h4>
                     <p>The following authentication methods will be implemented in future updates:</p>
                     <div class="row">
-                        <div class="col-md-4">
-                            <div class="card mb-3 auth-feature-card">
-                                <div class="card-body">
-                                    <h5 class="card-title">JWT Authentication</h5>
-                                    <p class="card-text">Token-based authentication using JSON Web Tokens.</p>
-                                    <button class="btn btn-outline-secondary btn-sm" disabled>Coming Soon</button>
-                                </div>
-                            </div>
-                        </div>
                         <div class="col-md-4">
                             <div class="card mb-3 auth-feature-card">
                                 <div class="card-body">
@@ -131,6 +142,18 @@
                                     <td>Digest Auth</td>
                                     <td>Protected endpoint using Digest Authentication</td>
                                 </tr>
+                                <tr>
+                                    <td><code>/token/login</code></td>
+                                    <td>POST</td>
+                                    <td>JWT Token</td>
+                                    <td>Get JWT token using username/password</td>
+                                </tr>
+                                <tr>
+                                    <td><code>/token/data</code></td>
+                                    <td>GET</td>
+                                    <td>JWT Token</td>
+                                    <td>Protected API endpoint requiring JWT token</td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -151,6 +174,17 @@
                         <pre>curl -v --digest -u admin:secret http://localhost:3000/auth/digest</pre>
                     </div>
                     <p class="mt-2"><small>Note: The <code>--digest</code> flag tells curl to handle the challenge-response mechanism automatically.</small></p>
+                    
+                    <h5 class="mt-3">JWT Token Authentication</h5>
+                    <p>Testing JWT Token Authentication with curl:</p>
+                    <div class="bg-light p-3 rounded">
+                        <pre>
+# First, get a token
+TOKEN=$(curl -s -X POST -H "Content-Type: application/json" -d '{"username":"admin","password":"secret"}' http://localhost:3000/token/login | jq -r '.access_token')
+
+# Then use the token to access protected resources
+curl -H "Authorization: Bearer $TOKEN" http://localhost:3000/token/data</pre>
+                    </div>
                     
                     <p class="mt-2">Default credentials for all authentication methods:</p>
                     <ul>

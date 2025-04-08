@@ -1,0 +1,24 @@
+---
+description: When implementing new features or updating existing ones, add tests
+globs: 
+alwaysApply: false
+---
+
+# Test Coverage
+
+When implementing new features or updating existing ones:
+
+1. Unit/Integration Tests:
+   - Write unit tests for each new function/method
+   - Update existing unit tests for modified functions
+   - Test both success and failure scenarios
+   - Mock external dependencies
+   - Aim for >80% code coverage
+   - Place in appropriate `/test` directory matching source structure
+
+2. End-to-End Tests:
+   - Write E2E tests for new API endpoints/flows
+   - Update existing E2E tests for modified endpoints
+   - Test complete user journeys
+   - Include authentication flows if applicable
+   - Test error handling and edge cases

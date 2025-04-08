@@ -12,6 +12,11 @@ This demo shows how to implement various authentication mechanisms in NestJS.
   - Multi-Factor Authentication (MFA) with verification codes
   - Session timeout and secure cookies
   - Flash messages for user feedback
+- Stateless Authentication with JWT tokens
+  - Token-based authentication with no server-side storage
+  - JWT (JSON Web Tokens) for secure, self-contained claims
+  - Client-side token storage using browser localStorage
+  - Authorization header for API requests
 
 ## Setup
 
@@ -50,6 +55,10 @@ The demo provides these endpoints:
 - `GET /auth/session/setup-mfa` - Setup Multi-Factor Authentication
 - `GET /auth/session/verify-mfa` - Verify MFA during login
 - `GET /auth/session/logout` - Logout and destroy session
+- `GET /token/login` - Form login for token-based authentication
+- `POST /token/login` - API endpoint to get JWT token
+- `GET /token/protected` - Protected by JWT token authentication
+- `GET /token/data` - Protected API endpoint requiring JWT token
 - `GET /debug/redis-session` - Debug tool for Redis session store (development only)
 
 Default credentials:
@@ -179,3 +188,72 @@ curl -v -H "Cookie: $COOKIE" http://localhost:3000/auth/session/logout
 ```
 
 Note: For MFA-enabled accounts, additional steps are required to complete authentication. 
+
+## Stateless Authentication Implementation
+
+The stateless (JWT token-based) authentication implementation uses these components:
+
+1. **JWT Strategy** - Implements Passport JWT strategy for token validation
+2. **Token Service** - Handles token generation and verification
+3. **JWT Auth Guard** - Protects routes requiring valid tokens
+4. **Client-side Storage** - Stores tokens in browser's localStorage
+5. **Token-based API** - Uses Authorization header for API requests
+
+### Authentication Flow
+
+When a user logs in:
+1. The user submits credentials (username/password)
+2. The server validates credentials against stored users
+3. Upon successful validation, a JWT token is generated with user information
+4. The token is signed with a secret key and returned to the client
+5. The client stores the token in localStorage
+6. Subsequent requests include the token in the Authorization header
+7. The server validates the token signature and extracts user information
+8. No session data is stored on the server
+
+### JWT Token Structure
+
+JWT tokens consist of three parts:
+
+1. **Header** - Contains algorithm information
+2. **Payload** - Contains user information and token metadata
+3. **Signature** - Verifies the token's integrity
+
+The payload typically includes:
+- `sub` - User ID (subject)
+- `username` - User's username
+- `iat` - Token issue timestamp
+- `exp` - Token expiration timestamp
+
+### Security Considerations
+
+- Tokens are signed to prevent tampering
+- Token expiration limits the window of opportunity for token misuse
+- Tokens are stored in localStorage, making them vulnerable to XSS attacks
+- The server validates token signatures to ensure authenticity
+- No server-side storage means no ability to invalidate individual tokens
+- Sensitive operations should still verify the user's password
+
+## Testing
+
+You can test the authentication endpoints using curl:
+
+### Stateless (JWT) Authentication
+
+```bash
+# Get a JWT token with valid credentials
+TOKEN=$(curl -s -X POST -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"secret"}' \
+  http://localhost:3000/token/login | jq -r '.access_token')
+
+# Access protected API with JWT token
+curl -v -H "Authorization: Bearer $TOKEN" http://localhost:3000/token/data
+
+# Invalid token (should fail)
+curl -v -H "Authorization: Bearer invalid.token.here" http://localhost:3000/token/data
+```
+
+Best tested through the browser interface at:
+```
+http://localhost:3000/token/login
+``` 
