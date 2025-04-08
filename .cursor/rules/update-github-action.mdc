@@ -1,0 +1,10 @@
+---
+description: Update Github Actions if new tests are written or updated
+globs: 
+alwaysApply: false
+---
+# Ensure .github/workflows/nestjs-app.yml is updated when adding or updating tests
+
+- Add new test commands to the workflow file
+- Update test job steps to include new test suites
+- Maintain consistent naming convention for test scripts in package.json
