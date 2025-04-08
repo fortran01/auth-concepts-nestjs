@@ -50,6 +50,7 @@ The demo provides these endpoints:
 - `GET /auth/session/setup-mfa` - Setup Multi-Factor Authentication
 - `GET /auth/session/verify-mfa` - Verify MFA during login
 - `GET /auth/session/logout` - Logout and destroy session
+- `GET /debug/redis-session` - Debug tool for Redis session store (development only)
 
 Default credentials:
 - Username: `admin`
@@ -64,6 +65,10 @@ The Stateful (Session) Authentication implementation uses the following componen
 3. **User Session Serialization** - Serializes user information for session storage
 4. **Flash Messages** - Provides user feedback on operations
 5. **MFA Support** - Adds an optional second authentication factor
+6. **Guards and Decorators** - Custom NestJS guards to protect routes
+7. **CSRF Protection** - Prevents cross-site request forgery attacks
+
+### Authentication Flow
 
 When a user logs in:
 1. The local strategy validates their credentials against stored users
@@ -72,6 +77,23 @@ When a user logs in:
 4. Only a session ID is sent to the client as a cookie
 5. Subsequent requests are authenticated using the session cookie
 6. Sessions expire after a configurable time (1 day by default)
+
+### Multi-Factor Authentication
+
+The MFA implementation follows these steps:
+1. User logs in with username and password
+2. If MFA is enabled, user is redirected to verification page
+3. User enters the verification code
+4. Code is validated against the stored secret
+5. Upon successful verification, the session is marked as fully authenticated
+
+### Session Management
+
+Sessions are managed with these features:
+- Automatic timeout after inactivity
+- Manual session termination via logout
+- Secure, HTTP-only, and SameSite cookies
+- Session data storage with configurable backends
 
 ### Redis Session Storage (Optional)
 
@@ -85,6 +107,22 @@ Using Redis provides these advantages:
 - Better scalability for distributed deployments
 - Centralized session management
 - Independent session timeout control
+
+### Redis Session Debug Tool
+
+The application includes a debug endpoint to inspect active Redis sessions:
+
+```
+http://localhost:3000/debug/redis-session
+```
+
+This tool provides the following features:
+- View all active sessions in the Redis store
+- Inspect session data, including user information and timestamps
+- Monitor session expiration times
+- Troubleshoot authentication issues
+
+Note: This endpoint should be disabled or protected in production environments.
 
 ## Security Considerations
 
@@ -124,3 +162,20 @@ Best tested through the browser interface at:
 ```
 http://localhost:3000/auth/session/login
 ``` 
+
+You can also test session authentication programmatically:
+
+```bash
+# Login and get session cookie
+COOKIE=$(curl -s -i -X POST http://localhost:3000/auth/session/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"secret"}' | grep -i "set-cookie" | cut -d' ' -f2)
+
+# Access protected resource with session cookie
+curl -v -H "Cookie: $COOKIE" http://localhost:3000/auth/session/protected
+
+# Logout (invalidates session)
+curl -v -H "Cookie: $COOKIE" http://localhost:3000/auth/session/logout
+```
+
+Note: For MFA-enabled accounts, additional steps are required to complete authentication. 
