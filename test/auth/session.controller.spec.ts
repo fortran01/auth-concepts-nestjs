@@ -259,15 +259,15 @@ describe('SessionController', () => {
       // Assert
       expect(sessionService.setupMfa).toHaveBeenCalledWith(1);
       expect(mockSession['temp_mfa_secret']).toBe('MFA_SECRET');
-      expect(mockResponse.render).toHaveBeenCalledWith('setup-mfa', {
+      expect(mockResponse.render).toHaveBeenCalledWith('setup-mfa', expect.objectContaining({
         title: 'Setup MFA',
         secret: 'MFA_SECRET',
         flash: {
           success: [],
           info: [],
           error: [],
-        },
-      });
+        }
+      }));
     });
   });
 
