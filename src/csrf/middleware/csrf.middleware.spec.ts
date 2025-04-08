@@ -78,7 +78,7 @@ describe('CsrfMiddleware', () => {
   it('should redirect for protected profile page with invalid token', () => {
     const mockRequest = {
       method: 'POST',
-      path: '/csrf-demo/update-email-protected',
+      path: '/csrf-demo/update-username-protected',
       body: {
         csrf_token: 'invalid-token',
       },

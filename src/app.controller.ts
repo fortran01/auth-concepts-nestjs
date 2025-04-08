@@ -12,7 +12,7 @@ export class AppController {
     return {
       title: 'Home',
       // Make flash messages available to the template
-      flash: req.session['flash']
+      flash: req.session ? req.session['flash'] || {} : {}
     };
   }
   
@@ -22,7 +22,7 @@ export class AppController {
     return {
       title: 'Debug Tools',
       // Make flash messages available to the template
-      flash: req.session['flash']
+      flash: req.session ? req.session['flash'] || {} : {}
     };
   }
 } 
