@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redis Session Debug</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        pre {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        .session-data {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container my-5">
+        <div class="row">
+            <div class="col-12">
+                <h1 class="mb-4">Redis Session Debug Tool</h1>
+                <div class="alert alert-warning">
+                    <strong>Warning:</strong> This debug tool should not be enabled in production environments as it exposes sensitive session data.
+                </div>
+                
+                {{#if redis_error}}
+                <div class="alert alert-danger mb-4">
+                    <strong>Redis Connection Error:</strong> {{redis_error}}
+                    <div class="mt-2">
+                        <p>Possible reasons:</p>
+                        <ul>
+                            <li>Redis server is not running</li>
+                            <li>Redis connection URL is incorrect</li>
+                            <li>Redis server is not accessible from this environment</li>
+                        </ul>
+                        <p>Start Redis with: <code>docker-compose up -d</code></p>
+                    </div>
+                </div>
+                {{/if}}
+                
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="mb-0">Session Information</h3>
+                    </div>
+                    <div class="card-body">
+                        <h4>Current Session ID</h4>
+                        <pre id="session-id">{{current_session_id}}</pre>
+                        
+                        <h4>Clean Session ID (without signature)</h4>
+                        <pre id="clean-session-id">{{clean_session_id}}</pre>
+                    </div>
+                </div>
+                
+                <div class="card mb-4">
+                    <div class="card-header bg-success text-white">
+                        <h3 class="mb-0">Current Session Data</h3>
+                    </div>
+                    <div class="card-body">
+                        <h4>From Request</h4>
+                        <div class="session-data">
+                            <pre id="current-session"></pre>
+                        </div>
+                        
+                        <h4>From Redis</h4>
+                        <div class="session-data">
+                            <pre id="redis-session"></pre>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        <h3 class="mb-0">All Redis Sessions</h3>
+                    </div>
+                    <div class="card-body">
+                        <p>Total sessions: <span id="session-count">0</span></p>
+                        <div class="accordion" id="sessionsAccordion"></div>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <a href="/" class="btn btn-outline-secondary">Back to Home</a>
+                    <button id="refreshBtn" class="btn btn-outline-primary ms-2">Refresh Data</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Function to load session data
+        async function loadSessionData() {
+            try {
+                // Fetch session data with explicit JSON request
+                const response = await fetch('/debug/redis-session', {
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                // Check if response is JSON
+                const contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    throw new Error(`Expected JSON but got ${contentType}`);
+                }
+                
+                const data = await response.json();
+                
+                // Update session IDs
+                document.getElementById('session-id').textContent = data.current_session_id || 'None';
+                document.getElementById('clean-session-id').textContent = data.clean_session_id || 'None';
+                
+                // Update current session data
+                document.getElementById('current-session').textContent = 
+                    JSON.stringify(data.current_session, null, 2);
+                
+                document.getElementById('redis-session').textContent = 
+                    JSON.stringify(data.current_session_from_redis, null, 2) || 'No data available';
+                
+                // Update all sessions
+                const sessionsAccordion = document.getElementById('sessionsAccordion');
+                const sessionsCount = document.getElementById('session-count');
+                
+                // Clear previous content
+                sessionsAccordion.innerHTML = '';
+                
+                const keys = Object.keys(data.all_sessions || {});
+                sessionsCount.textContent = keys.length;
+                
+                // Only process if we have sessions
+                if (keys.length > 0) {
+                    keys.forEach((key, index) => {
+                        const sessionData = data.all_sessions[key];
+                        const isCurrentSession = key === `session:${data.clean_session_id}`;
+                        
+                        const accordionItem = document.createElement('div');
+                        accordionItem.className = 'accordion-item';
+                        
+                        const sessionHeader = document.createElement('h2');
+                        sessionHeader.className = 'accordion-header';
+                        sessionHeader.id = `heading${index}`;
+                        
+                        const button = document.createElement('button');
+                        button.className = `accordion-button ${index === 0 ? '' : 'collapsed'}`;
+                        button.type = 'button';
+                        button.setAttribute('data-bs-toggle', 'collapse');
+                        button.setAttribute('data-bs-target', `#collapse${index}`);
+                        button.setAttribute('aria-expanded', index === 0 ? 'true' : 'false');
+                        button.setAttribute('aria-controls', `collapse${index}`);
+                        
+                        const badge = isCurrentSession ? 
+                            '<span class="badge bg-success ms-2">Current Session</span>' : '';
+                        
+                        button.innerHTML = `${key} ${badge}`;
+                        
+                        sessionHeader.appendChild(button);
+                        
+                        const collapseDiv = document.createElement('div');
+                        collapseDiv.id = `collapse${index}`;
+                        collapseDiv.className = `accordion-collapse collapse ${index === 0 ? 'show' : ''}`;
+                        collapseDiv.setAttribute('aria-labelledby', `heading${index}`);
+                        collapseDiv.setAttribute('data-bs-parent', '#sessionsAccordion');
+                        
+                        const accordionBody = document.createElement('div');
+                        accordionBody.className = 'accordion-body';
+                        
+                        const pre = document.createElement('pre');
+                        pre.textContent = JSON.stringify(sessionData, null, 2);
+                        
+                        accordionBody.appendChild(pre);
+                        collapseDiv.appendChild(accordionBody);
+                        
+                        accordionItem.appendChild(sessionHeader);
+                        accordionItem.appendChild(collapseDiv);
+                        
+                        sessionsAccordion.appendChild(accordionItem);
+                    });
+                } else {
+                    // Display a message when no sessions are found
+                    if (data.redis_error) {
+                        sessionsAccordion.innerHTML = `<div class="alert alert-danger">Redis error: ${data.redis_error}</div>`;
+                    } else {
+                        sessionsAccordion.innerHTML = '<div class="alert alert-info">No Redis sessions found. Make sure Redis is running and sessions are being stored.</div>';
+                    }
+                }
+            } catch (error) {
+                console.error('Error fetching session data:', error);
+                document.getElementById('current-session').textContent = 
+                    `Error fetching session data: ${error.message}`;
+                document.getElementById('redis-session').textContent = 
+                    'No data available';
+                document.getElementById('sessionsAccordion').innerHTML = 
+                    '<div class="alert alert-danger">Error fetching session data. Make sure Redis is running and properly configured.</div>';
+            }
+        }
+        
+        // Load data when the page loads
+        document.addEventListener('DOMContentLoaded', loadSessionData);
+        
+        // Set up refresh button
+        document.getElementById('refreshBtn').addEventListener('click', loadSessionData);
+    </script>
+</body>
+</html> 

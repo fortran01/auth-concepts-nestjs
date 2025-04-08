@@ -12,4 +12,12 @@ export class AppController {
       title: 'Home'
     };
   }
+  
+  @Get('debug-tools')
+  @Render('debug-tools')
+  getDebugTools() {
+    return {
+      title: 'Debug Tools'
+    };
+  }
 } 

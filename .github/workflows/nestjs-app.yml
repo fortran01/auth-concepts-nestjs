@@ -56,6 +56,12 @@ jobs:
       - name: Session-specific E2E tests
         run: npm run test:session:e2e
 
+      - name: Debug-specific unit tests
+        run: npm run test:debug
+
+      - name: Debug-specific E2E tests
+        run: npm run test:debug:e2e
+
   build:
     runs-on: ubuntu-latest
     needs: test

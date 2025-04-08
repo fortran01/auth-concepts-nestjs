@@ -5,6 +5,8 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
 import * as session from 'express-session';
 import * as passport from 'passport';
+import { createClient } from 'redis';
+import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -25,21 +27,74 @@ async function bootstrap() {
   // Serve static files
   app.useStaticAssets(publicPath);
   
+  // Use cookie-parser middleware
+  app.use(cookieParser());
+  
   const configService = app.get(ConfigService);
   
-  // Set up sessions with memory store (simple approach for the demo)
-  // In production, you would use Redis or another external session store
-  app.use(
-    session({
-      secret: configService.get('SESSION_SECRET') || 'super-secret-key',
-      resave: false,
-      saveUninitialized: false,
-      cookie: {
-        maxAge: 1000 * 60 * 60 * 24, // 1 day
-        httpOnly: true,
-      },
-    }),
-  );
+  let redisStore;
+  
+  try {
+    // Create Redis client
+    const redisClient = createClient({
+      url: configService.get('REDIS_URL') || 'redis://localhost:6380',
+      socket: {
+        connectTimeout: 5000, // 5 second timeout
+      }
+    });
+    
+    // Add event listeners for debugging
+    redisClient.on('error', (err) => {
+      console.error('Redis client error:', err);
+    });
+    
+    redisClient.on('connect', () => {
+      console.log('Redis client connected');
+    });
+    
+    redisClient.on('reconnecting', () => {
+      console.log('Redis client reconnecting');
+    });
+    
+    console.log('Attempting to connect to Redis...');
+    await redisClient.connect();
+    console.log('Redis client connected successfully');
+    
+    // Create Redis store (connect-redis v8.x syntax)
+    const { RedisStore } = await import('connect-redis');
+    
+    redisStore = new RedisStore({
+      client: redisClient,
+      prefix: 'session:',
+    });
+    
+    console.log('Redis session store created successfully');
+  } catch (err) {
+    console.error('Redis connection error:', err);
+    console.log('Continuing with memory store. Some functionality like the Redis session debug tool will be limited.');
+  }
+  
+  // Default session configuration
+  const sessionConfig: session.SessionOptions = {
+    secret: configService.get('SESSION_SECRET') || 'super-secret-key',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      maxAge: 1000 * 60 * 60 * 24, // 1 day
+      httpOnly: true,
+    }
+  };
+  
+  // Add Redis store if available
+  if (redisStore) {
+    sessionConfig.store = redisStore;
+    console.log('Using Redis for session storage');
+  } else {
+    console.log('Using in-memory session storage - sessions will be lost on server restart');
+  }
+  
+  // Set up sessions
+  app.use(session(sessionConfig));
   
   // Initialize passport
   app.use(passport.initialize());

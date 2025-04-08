@@ -1,0 +1,18 @@
+---
+description: Document newly-built feature or updated features in README.md
+globs: 
+alwaysApply: false
+---
+# Documentation Rules
+
+1. For New Features:
+   - Add to correct section
+   - Write clear description
+   - Include setup steps
+   - Add examples if needed
+
+2. For Updates:
+   - Find relevant section
+   - Keep consistent style
+   - Update information
+   - Remove old content
