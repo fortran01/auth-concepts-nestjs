@@ -7,16 +7,46 @@ import * as cookieParser from 'cookie-parser';
 import * as passport from 'passport';
 import { join } from 'path';
 import { AppModule } from '../../src/app.module';
+import { DebugService } from '../../src/debug/debug.service';
+
+// Mock for Redis client
+const mockRedisClient = {
+  connect: jest.fn().mockResolvedValue(true),
+  keys: jest.fn().mockResolvedValue(['session:test1', 'session:test2']),
+  get: jest.fn().mockImplementation((key) => {
+    return Promise.resolve(JSON.stringify({ 
+      cookie: { expires: new Date(), httpOnly: true, originalMaxAge: 86400000, path: '/' },
+      flash: {}
+    }));
+  }),
+  isOpen: true,
+  disconnect: jest.fn().mockResolvedValue(true)
+};
 
 describe('Debug Controller (e2e)', () => {
   let app: NestExpressApplication;
+  let debugService: DebugService;
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
-    }).compile();
+    })
+    .overrideProvider(DebugService)
+    .useValue({
+      getRedisClient: jest.fn().mockResolvedValue(mockRedisClient),
+      getRedisSessionData: jest.fn().mockResolvedValue({
+        sessionKeys: ['session:test1', 'session:test2'],
+        sessions: {
+          'session:test1': { cookie: {}, flash: {} },
+          'session:test2': { cookie: {}, flash: {} }
+        },
+        matchedSession: { cookie: {}, flash: {} }
+      })
+    })
+    .compile();
 
     app = moduleFixture.createNestApplication<NestExpressApplication>();
+    debugService = moduleFixture.get<DebugService>(DebugService);
     
     // Setup template engine
     app.setViewEngine('hbs');
