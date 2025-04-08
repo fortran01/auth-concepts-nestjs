@@ -257,3 +257,84 @@ Best tested through the browser interface at:
 ```
 http://localhost:3000/token/login
 ``` 
+
+### Token Authentication
+
+Token-based authentication can be tested through the browser interface at:
+```
+http://localhost:3000/token/login
+```
+
+You can also test token authentication programmatically:
+
+```bash
+# Get JWT token with valid credentials
+TOKEN=$(curl -s -X POST http://localhost:3000/token/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"secret"}' | jq -r '.access_token')
+
+# Access protected API endpoint with token
+curl -v -H "Authorization: Bearer $TOKEN" http://localhost:3000/token/data
+
+# Access protected page with token
+curl -v -H "Authorization: Bearer $TOKEN" http://localhost:3000/token/protected
+```
+
+## Running Tests
+
+The application includes comprehensive tests for all authentication methods:
+
+```bash
+# Run unit tests
+npm run test
+
+# Run integration/e2e tests
+npm run test:e2e
+
+# Run tests with coverage
+npm run test:cov
+```
+
+### Test Coverage
+
+Tests are organized to verify:
+
+1. **Unit Tests** - Testing individual components:
+   - Authentication services (AuthService, TokenService)
+   - Authentication strategies (LocalStrategy, JwtStrategy)
+   - Guards (SessionGuard, JwtAuthGuard)
+   - Controllers (AuthController, TokenController)
+
+2. **End-to-End Tests** - Testing complete authentication flows:
+   - Basic auth flow with challenge-response
+   - Digest auth flow with nonce validation
+   - Session authentication with login/logout
+   - Token authentication with JWT token generation/validation
+   - Multi-factor authentication sequence
+
+### Mocking Strategy
+
+The tests use Jest for mocking:
+- External dependencies like bcrypt are mocked
+- NestJS testing utilities to create isolated module environments
+- For E2E tests, a full application instance is created
+
+## Test Files
+
+- `auth.service.spec.ts` - Tests for the main auth service
+- `basic-auth.guard.spec.ts` - Tests for basic auth guard
+- `basic-auth.middleware.spec.ts` - Tests for basic auth middleware
+- `basic-auth.e2e-spec.ts` - E2E tests for basic auth flow
+- `digest-auth.spec.ts` - Tests for digest auth implementation
+- `digest-auth.e2e-spec.ts` - E2E tests for digest auth flow
+- `local.strategy.spec.ts` - Tests for local auth strategy
+- `session.guard.spec.ts` - Tests for session-based guards
+- `session.serializer.spec.ts` - Tests for user serialization
+- `session.service.spec.ts` - Tests for session management
+- `session.controller.spec.ts` - Tests for session endpoints
+- `session-auth.e2e-spec.ts` - E2E tests for session auth flow
+- `token.service.spec.ts` - Tests for JWT token service
+- `jwt.strategy.spec.ts` - Tests for JWT strategy
+- `jwt-auth.guard.spec.ts` - Tests for JWT auth guard
+- `token.controller.spec.ts` - Tests for token endpoints
+- `token-auth.e2e-spec.ts` - E2E tests for token auth flow 
