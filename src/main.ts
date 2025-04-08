@@ -10,7 +10,10 @@ import * as cookieParser from 'cookie-parser';
 import * as hbs from 'hbs';
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  // Explicitly disable global CORS
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+    cors: false, // Disable global CORS to allow our demo
+  });
   
   // Determine the absolute path to the views directory
   // This works in both development and production
@@ -147,7 +150,11 @@ async function bootstrap() {
     next();
   });
   
-  const port = configService.get('PORT') || 3001;
+  // Do not enable CORS globally, only for specific routes in controllers
+  // We'll handle CORS in the individual controllers using response headers
+  
+  // Explicitly use port 3001 for the CORS demo
+  const port = 3001;
   
   await app.listen(port);
   console.log(`Application is running on: http://localhost:${port}`);

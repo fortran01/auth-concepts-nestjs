@@ -17,6 +17,11 @@ This demo shows how to implement various authentication mechanisms in NestJS.
   - JWT (JSON Web Tokens) for secure, self-contained claims
   - Client-side token storage using browser localStorage
   - Authorization header for API requests
+- Cross-Origin Resource Sharing (CORS) Demo
+  - Demonstrates browser's Same-Origin Policy
+  - Shows how CORS headers enable controlled cross-origin access
+  - Illustrates various CORS configurations
+  - Displays preflight requests in action
 
 ## Setup
 
@@ -59,6 +64,13 @@ The demo provides these endpoints:
 - `POST /token/login` - API endpoint to get JWT token
 - `GET /token/protected` - Protected by JWT token authentication
 - `GET /token/data` - Protected API endpoint requiring JWT token
+- `GET /cors-demo/info` - Information about the CORS demo
+- `GET /cors-demo` - CORS demo UI
+- `GET /api/data` - API endpoint without CORS headers
+- `GET /api/data-with-cors` - API endpoint with CORS headers for all origins
+- `GET /api/data-with-specific-cors` - API endpoint with CORS headers for specific origin
+- `GET /api/data-with-preflight` - API endpoint that handles preflight requests
+- `GET /api/data-with-nest-cors` - API endpoint with NestJS built-in CORS support
 - `GET /debug/redis-session` - Debug tool for Redis session store (development only)
 
 Default credentials:
@@ -338,3 +350,67 @@ The tests use Jest for mocking:
 - `jwt-auth.guard.spec.ts` - Tests for JWT auth guard
 - `token.controller.spec.ts` - Tests for token endpoints
 - `token-auth.e2e-spec.ts` - E2E tests for token auth flow 
+
+## Cross-Origin Resource Sharing (CORS) Demo
+
+This project includes a demonstration of Cross-Origin Resource Sharing (CORS) with different configuration approaches. To run the full CORS demo:
+
+1. Start the API server on port 3001 (if not already running):
+   ```
+   npm run start
+   ```
+
+2. In a separate terminal, start the CORS client server on port 4001:
+   ```
+   npm run start:cors-client
+   ```
+
+3. Open your browser and navigate to:
+   ```
+   http://localhost:4001/cors-demo
+   ```
+
+The demo demonstrates different CORS scenarios:
+- No CORS headers (fails due to same-origin policy)
+- CORS enabled for all origins
+- CORS enabled for specific origin
+- Complex requests with preflight OPTIONS handling
+- Advanced CORS configuration with NestJS
+
+Both servers must be running simultaneously for the demo to work properly.
+
+### Features Demonstrated
+
+- **Same-Origin Policy**: Shows how browsers block cross-origin requests by default
+- **CORS Headers**: Demonstrates how proper headers enable cross-origin requests
+- **Specific Origins**: Shows how to limit CORS access to specific origins
+- **Preflight Requests**: Illustrates how complex requests trigger OPTIONS preflight
+- **NestJS CORS Support**: Shows NestJS's built-in CORS implementation
+
+### Endpoints
+
+- `GET /api/data` - No CORS headers (will be blocked from different origin)
+- `GET /api/data-with-cors` - CORS headers allowing all origins
+- `GET /api/data-with-specific-cors` - CORS headers for specific origin only
+- `GET /api/data-with-preflight` - Handles preflight requests for complex requests
+- `GET /api/data-with-nest-cors` - Uses NestJS built-in CORS support
+
+### Implementation Details
+
+The CORS demo uses these key components:
+
+1. **No CORS Headers**: A custom middleware strips all CORS headers from the response to demonstrate how browsers block cross-origin requests when no CORS headers are present
+2. **Manual CORS Headers**: Shows how to manually add CORS headers to responses
+3. **Origin Restrictions**: Shows how to restrict CORS access to specific origins
+4. **Preflight Handling**: Demonstrates OPTIONS request handling for complex requests
+5. **Advanced CORS Configuration**: Shows comprehensive CORS headers for production use
+
+Each scenario in the demo shows a different aspect of CORS:
+
+1. **Scenario 1** - No CORS headers: Shows a request being blocked by the browser due to Same-Origin Policy
+2. **Scenario 2** - CORS enabled for all origins: Allows access from any origin with `Access-Control-Allow-Origin: *`
+3. **Scenario 3** - CORS enabled for specific origin: Only allows access from the client application
+4. **Scenario 4** - Complex request with preflight: Shows the browser sending an OPTIONS request first
+5. **Scenario 5** - Complete CORS configuration: Shows a comprehensive set of CORS headers including credentials support
+
+For deeper understanding, open your browser's Developer Tools and observe the Network tab while using the demo to see how CORS headers affect the requests. 

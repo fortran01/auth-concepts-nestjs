@@ -1,0 +1,100 @@
+{{!< layout }}
+
+<div class="container my-5">
+    <h1>Cross-Origin Resource Sharing (CORS) Demo</h1>
+    
+    <div class="alert alert-info">
+        <strong>Note:</strong> This demo runs as two separate applications to demonstrate cross-origin behavior.
+    </div>
+    
+    <div class="card shadow mb-4">
+        <div class="card-header">
+            <h2 class="h5 mb-0">Demo Setup</h2>
+        </div>
+        <div class="card-body">
+            <p>To experience the CORS demo, you need to run two separate NestJS applications:</p>
+            
+            <ol>
+                <li>
+                    <strong>API Server</strong> - Runs on port 3001
+                    <ul>
+                        <li>Provides various API endpoints with different CORS configurations</li>
+                        <li>Demonstrates various ways to enable and configure CORS</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>Client Application</strong> - Runs on port 4001
+                    <ul>
+                        <li>Simple web UI that makes requests to the API Server</li>
+                        <li>Demonstrates how browsers handle cross-origin requests</li>
+                    </ul>
+                </li>
+            </ol>
+        </div>
+    </div>
+    
+    <div class="card shadow mb-4">
+        <div class="card-header">
+            <h2 class="h5 mb-0">Running the Demo</h2>
+        </div>
+        <div class="card-body">
+            <p>Follow these steps to run the CORS demo:</p>
+            
+            <div class="alert alert-warning">
+                <strong>Important:</strong> These commands should be run in separate terminal windows.
+            </div>
+            
+            <h5>1. Start the API Server:</h5>
+            <div class="bg-light p-3 rounded mb-3">
+                <code>npm run start</code>
+            </div>
+            
+            <h5>2. Start the Client Application:</h5>
+            <div class="bg-light p-3 rounded mb-3">
+                <code>npm run start:cors-client</code>
+            </div>
+            
+            <h5>3. Access the Demo:</h5>
+            <div class="bg-light p-3 rounded mb-3">
+                <a href="http://localhost:4001/cors-demo" target="_blank" class="btn btn-primary">
+                    Open CORS Demo (http://localhost:4001/cors-demo)
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card shadow mb-4">
+        <div class="card-header">
+            <h2 class="h5 mb-0">What You'll Learn</h2>
+        </div>
+        <div class="card-body">
+            <p>This demo demonstrates:</p>
+            
+            <ul>
+                <li>How the Same-Origin Policy restricts cross-origin requests</li>
+                <li>How CORS headers enable controlled cross-origin access</li>
+                <li>Various CORS configurations (open access, specific origins, etc.)</li>
+                <li>How preflight requests work for complex cross-origin requests</li>
+                <li>Using NestJS built-in CORS support for easy implementation</li>
+            </ul>
+            
+            <p>Be sure to open your browser's Developer Tools (F12) and navigate to the Network tab to fully understand what's happening as you test the demo.</p>
+        </div>
+    </div>
+    
+    <div class="card shadow">
+        <div class="card-header">
+            <h2 class="h5 mb-0">Files in this Demo</h2>
+        </div>
+        <div class="card-body">
+            <ul>
+                <li><strong>src/cors/cors-api.controller.ts</strong> - The API controller with various CORS configurations</li>
+                <li><strong>src/cors/cors-client.controller.ts</strong> - The client controller that serves the demo UI</li>
+                <li><strong>src/views/cors-demo.hbs</strong> - The client UI that demonstrates CORS behavior</li>
+                <li><strong>src/cors/cors.service.ts</strong> - Service providing the data for the API endpoints</li>
+            </ul>
+            
+            <p>Check out the <a href="https://github.com/your-username/auth-concepts-nestjs" target="_blank">GitHub repository</a> for the full source code.</p>
+        </div>
+    </div>
+</div> 
