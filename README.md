@@ -87,6 +87,10 @@ The demo provides these endpoints:
 - `POST /token/login` - API endpoint to get JWT token
 - `GET /token/protected` - Protected by JWT token authentication
 - `GET /token/data` - Protected API endpoint requiring JWT token
+- `GET /auth0/login` - Redirects to Auth0 Universal Login page
+- `GET /auth0/callback` - Callback URL for Auth0 authentication
+- `GET /auth0/profile` - Displays authenticated user's Auth0 profile
+- `GET /auth0/logout` - Logs out user from both app and Auth0
 - `GET /cors-demo/info` - Information about the CORS demo
 - `GET /cors-demo` - CORS demo UI
 - `GET /api/data` - API endpoint without CORS headers
