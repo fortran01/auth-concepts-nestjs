@@ -37,6 +37,13 @@ The tests are organized into several files:
 - **ldap.controller.spec.ts**: Unit tests for the LdapController
 - **ldap.service.spec.ts**: Unit tests for the LdapService
 
+### Auth0 Authentication
+- **auth0-auth.e2e-spec.ts**: End-to-end tests for Auth0 authentication
+- **auth0.controller.spec.ts**: Unit tests for the Auth0Controller
+- **auth0.service.spec.ts**: Unit tests for the Auth0Service
+- **auth0.guard.spec.ts**: Unit tests for the Auth0Guard
+- **auth0.strategy.spec.ts**: Unit tests for the Auth0Strategy
+
 ## Running the Tests
 
 To run all auth tests:
@@ -101,4 +108,36 @@ The LDAP authentication tests verify:
    - Complete login flow
    - Handling invalid credentials
    - Displaying user information after login
-   - Testing connection status 
+   - Testing connection status
+
+## Auth0 Authentication Tests
+
+The Auth0 authentication tests verify:
+
+1. **Service Tests**:
+   - Exchange of authorization code for tokens
+   - Retrieval of user profile with access token
+   - Error handling for failed requests
+
+2. **Controller Tests**:
+   - Redirection to Auth0 login page
+   - Handling callback with authorization code
+   - Session management for authenticated users
+   - Profile page rendering
+   - Logout functionality
+
+3. **Guard Tests**:
+   - Protection of routes based on session authentication
+   - Proper authentication state detection
+
+4. **Strategy Tests**:
+   - Configuration of Auth0 strategy with correct parameters
+   - User profile validation and transformation
+
+5. **E2E Tests**:
+   - Complete Auth0 authentication flow
+   - Login redirection
+   - Callback processing
+   - Session persistence
+   - Profile display
+   - Logout and session clearing 

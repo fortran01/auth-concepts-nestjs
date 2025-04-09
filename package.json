@@ -25,6 +25,8 @@
     "test:session:e2e": "jest --config ./test/jest-e2e.json --testPathPattern=test/auth/session-auth.e2e-spec.ts",
     "test:ldap": "jest \"test/auth/ldap.(service|controller).spec.ts\"",
     "test:ldap:e2e": "jest --config ./test/jest-e2e.json \"test/auth/ldap-auth.e2e-spec.ts\"",
+    "test:auth0": "jest \"test/auth/auth0.(controller|service|guard|strategy).spec.ts\"",
+    "test:auth0:e2e": "jest --config ./test/jest-e2e.json \"test/auth/auth0-auth.e2e-spec.ts\"",
     "test:debug:e2e": "jest --config ./test/jest-e2e.json --testPathPattern=test/debug/.*\\.e2e-spec\\.ts",
     "generate-hash": "node src/scripts/generate-hash.js",
     "test:digest": "node src/scripts/test-digest-auth.js",

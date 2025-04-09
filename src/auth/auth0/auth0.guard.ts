@@ -7,7 +7,7 @@ export class Auth0Guard implements CanActivate {
     const request = context.switchToHttp().getRequest<Request>();
     
     // Check if user is authenticated with Auth0
-    const isAuthenticated = !!request.session['auth0User'];
+    const isAuthenticated = !!(request.session && request.session['auth0User']);
     
     return isAuthenticated;
   }

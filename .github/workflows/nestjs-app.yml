@@ -37,6 +37,11 @@ jobs:
           # Set test-specific environment variables if needed
           echo "JWT_SECRET=test-secret-for-ci" >> .env
           echo "NODE_ENV=test" >> .env
+          echo "AUTH0_DOMAIN=test-domain.auth0.com" >> .env
+          echo "AUTH0_CLIENT_ID=test-client-id" >> .env
+          echo "AUTH0_CLIENT_SECRET=test-client-secret" >> .env
+          echo "AUTH0_CALLBACK_URL=http://localhost:3000/auth0/callback" >> .env
+          echo "AUTH0_LOGOUT_URL=http://localhost:3000" >> .env
 
       - name: Unit tests
         run: npm run test
@@ -61,6 +66,12 @@ jobs:
 
       - name: LDAP-specific E2E tests
         run: npm run test:ldap:e2e
+
+      - name: Auth0-specific unit tests
+        run: npm run test:auth0
+
+      - name: Auth0-specific E2E tests
+        run: npm run test:auth0:e2e
 
       - name: Debug-specific unit tests
         run: npm run test:debug
