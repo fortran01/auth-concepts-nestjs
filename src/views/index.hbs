@@ -2,7 +2,7 @@
     <div class="col-md-10 offset-md-1">
         <div class="card">
             <div class="card-header">
-                <h2 class="text-center">NestJS Authentication Concepts Demo</h2>
+                <h2 class="text-center">Authentication Concepts Demo</h2>
             </div>
             <div class="card-body">
                 <p class="lead text-center">
@@ -10,71 +10,48 @@
                 </p>
                 
                 <div class="row mt-4">
-                    <div class="col-md-6">
-                        <div class="card mb-4 auth-feature-card">
+                    <div class="col-md-3">
+                        <div class="card mb-4 h-100">
                             <div class="card-header bg-primary text-white">
-                                <h3 class="mb-0">Basic Authentication</h3>
+                                <h3 class="mb-0">Stateful Authentication</h3>
                             </div>
                             <div class="card-body">
-                                <p>Demonstration of Basic Authentication with password hashing.</p>
+                                <p>Demonstration of server-side sessions stored in Redis.</p>
                                 <ul>
-                                    <li>Username/password authentication using HTTP headers</li>
-                                    <li>Password hashing with bcrypt</li>
-                                    <li>Implementation using NestJS Guards</li>
-                                    <li>Secure password storage</li>
+                                    <li>Session data stored on server</li>
+                                    <li>Only session ID stored in client cookie</li>
+                                    <li>Includes Multi-Factor Authentication</li>
+                                    <li>Server maintains state</li>
                                 </ul>
                                 <div class="d-grid gap-2">
-                                    <a href="/auth/basic" class="btn btn-primary">Try Basic Authentication</a>
+                                    <a href="/auth/session/login" class="btn btn-primary">Try Session Login</a>
                                 </div>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="col-md-6">
-                        <div class="card mb-4 auth-feature-card">
-                            <div class="card-header bg-success text-white">
-                                <h3 class="mb-0">Digest Authentication</h3>
+                    <div class="col-md-3">
+                        <div class="card mb-4 h-100">
+                            <div class="card-header bg-secondary text-white">
+                                <h3 class="mb-0">Auth0 Universal Login</h3>
                             </div>
                             <div class="card-body">
-                                <p>Demonstration of Digest Authentication with nonce-based challenge-response.</p>
+                                <p>Demonstration of Auth0 Universal Login integration.</p>
                                 <ul>
-                                    <li>Challenge-response authentication mechanism</li>
-                                    <li>Nonce-based security to prevent replay attacks</li>
-                                    <li>No plaintext password transmission</li>
-                                    <li>MD5 hashing for response verification</li>
+                                    <li>IDaaS (Identity as a Service)</li>
+                                    <li>OpenID Connect (OIDC) flow</li>
+                                    <li>Centralized user management</li>
+                                    <li>Social and enterprise options</li>
                                 </ul>
                                 <div class="d-grid gap-2">
-                                    <a href="/auth/digest" class="btn btn-success">Try Digest Authentication</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row mt-4">
-                    <div class="col-md-6">
-                        <div class="card mb-4 auth-feature-card">
-                            <div class="card-header bg-info text-white">
-                                <h3 class="mb-0">Session Authentication</h3>
-                            </div>
-                            <div class="card-body">
-                                <p>Demonstration of server-side session authentication with Redis.</p>
-                                <ul>
-                                    <li>Form-based authentication with modern UI</li>
-                                    <li>Server-side session storage with Redis</li>
-                                    <li>Flash messages for user feedback</li>
-                                    <li>Multi-Factor Authentication support</li>
-                                    <li>Stateful session management</li>
-                                </ul>
-                                <div class="d-grid gap-2">
-                                    <a href="/auth/session/login" class="btn btn-info">Try Session Authentication</a>
+                                    <a href="/auth0/login" class="btn btn-secondary">Try Auth0 Login</a>
                                 </div>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="col-md-6">
-                        <div class="card mb-4 auth-feature-card">
+                    <div class="col-md-3">
+                        <div class="card mb-4 h-100">
                             <div class="card-header bg-success text-white">
                                 <h3 class="mb-0">Stateless Authentication</h3>
                             </div>
@@ -83,40 +60,34 @@
                                 <ul>
                                     <li>All session data stored in token</li>
                                     <li>Token stored in browser's localStorage</li>
+                                    <li>No MFA (simplified for demo)</li>
                                     <li>Server is stateless</li>
-                                    <li>Client-side token management</li>
                                 </ul>
                                 <div class="d-grid gap-2">
-                                    <a href="/token/login" class="btn btn-success">Try Token Authentication</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row mt-4">
-                    <div class="col-md-6">
-                        <div class="card mb-4 auth-feature-card">
-                            <div class="card-header bg-warning text-dark">
-                                <h3 class="mb-0">LDAP Authentication</h3>
-                            </div>
-                            <div class="card-body">
-                                <p>Demonstration of direct LDAP authentication against an LDAP server.</p>
-                                <ul>
-                                    <li>Direct binding to LDAP server for authentication</li>
-                                    <li>LDAP user attribute retrieval</li>
-                                    <li>No password storage in application</li>
-                                    <li>Simple form-based UI with error handling</li>
-                                </ul>
-                                <div class="d-grid gap-2">
-                                    <a href="/auth/ldap" class="btn btn-warning">Try LDAP Authentication</a>
+                                    <a href="/token/login" class="btn btn-success">Try Token Login</a>
                                 </div>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="col-md-6">
-                        <!-- Space for future authentication method -->
+                    <div class="col-md-3">
+                        <div class="card mb-4 h-100">
+                            <div class="card-header bg-info text-white">
+                                <h3 class="mb-0">LDAP Authentication</h3>
+                            </div>
+                            <div class="card-body">
+                                <p>Direct authentication against an LDAP directory.</p>
+                                <ul>
+                                    <li>Authenticates directly against OpenLDAP</li>
+                                    <li>No MFA (direct LDAP only)</li>
+                                    <li>Employee directory integration</li>
+                                    <li>Shows DN binding and user attributes</li>
+                                </ul>
+                                <div class="d-grid gap-2">
+                                    <a href="/auth/ldap" class="btn btn-info">Try LDAP Login</a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 

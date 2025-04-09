@@ -11,6 +11,7 @@ import { TokenModule } from './token/token.module';
 import { SessionController } from './session/session.controller';
 import { SessionService } from './session/session.service';
 import { LdapModule } from './ldap/ldap.module';
+import { Auth0Module } from './auth0/auth0.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { LdapModule } from './ldap/ldap.module';
     PassportModule.register({ session: true }),
     TokenModule,
     LdapModule,
+    Auth0Module,
   ],
   providers: [
     AuthService, 

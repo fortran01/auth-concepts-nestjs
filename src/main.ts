@@ -27,6 +27,11 @@ async function bootstrap() {
   // Register partials directory
   hbs.registerPartials(partialsPath);
   
+  // Register Handlebars helpers
+  hbs.registerHelper('json', function(context) {
+    return JSON.stringify(context, null, 2);
+  });
+  
   // Set up template engine
   app.setBaseViewsDir(viewsPath);
   app.setViewEngine('hbs');

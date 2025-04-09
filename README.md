@@ -22,6 +22,11 @@ This demo shows how to implement various authentication mechanisms in NestJS.
   - LDAP user attribute retrieval
   - No password storage in application
   - Includes OpenLDAP server in Docker for testing
+- Auth0 Universal Login
+  - Integration with Auth0 Identity as a Service
+  - OpenID Connect (OIDC) authorization code flow
+  - User profile display
+  - Centralized authentication management
 - Cross-Origin Resource Sharing (CORS) Demo
   - Demonstrates browser's Same-Origin Policy
   - Shows how CORS headers enable controlled cross-origin access
@@ -545,3 +550,53 @@ Each scenario in the demo shows a different aspect of CORS:
 5. **Scenario 5** - Complete CORS configuration: Shows a comprehensive set of CORS headers including credentials support
 
 For deeper understanding, open your browser's Developer Tools and observe the Network tab while using the demo to see how CORS headers affect the requests. 
+
+## Auth0 Universal Login Implementation
+
+The Auth0 Universal Login implementation uses the following components:
+
+1. **Auth0 Strategy** - Implements Passport Auth0 strategy for OIDC authentication
+2. **Auth0 Service** - Handles token exchange and user profile retrieval
+3. **Auth0 Controller** - Manages the authentication flow and rendering templates
+4. **Auth0 Guard** - Protects routes requiring Auth0 authentication
+5. **Session Integration** - Stores authenticated user data in session
+
+### Auth0 Authentication Flow
+
+When a user logs in:
+1. The user is redirected to Auth0's login page
+2. Auth0 handles user authentication (including social logins if configured)
+3. After successful authentication, Auth0 redirects back to the application with a code
+4. The application exchanges this code for access and ID tokens
+5. The application uses the access token to retrieve the user profile
+6. The user profile is stored in the session
+7. The user is redirected to a protected profile page
+
+### Auth0 Setup
+
+To use Auth0 with this demo:
+
+1. Create a free Auth0 account at [auth0.com](https://auth0.com)
+2. Create a Regular Web Application in the Auth0 Dashboard
+3. Configure the application with these settings:
+   - Allowed Callback URLs: `http://localhost:3001/auth0/callback`
+   - Allowed Logout URLs: `http://localhost:3001`
+   - Allowed Web Origins: `http://localhost:3001`
+4. Update the `.env` file with your Auth0 credentials:
+   ```
+   AUTH0_DOMAIN=your-tenant.auth0.com
+   AUTH0_CLIENT_ID=your-client-id
+   AUTH0_CLIENT_SECRET=your-client-secret
+   AUTH0_CALLBACK_URL=http://localhost:3001/auth0/callback
+   AUTH0_LOGOUT_URL=http://localhost:3001
+   ```
+
+### Benefits of Auth0 Integration
+
+- Fully customizable login and registration pages
+- Support for social logins (Google, Facebook, GitHub, etc.)
+- Enterprise connections (LDAP, Active Directory, SAML)
+- Advanced security features like Brute Force Protection
+- Multi-factor Authentication (MFA)
+- Centralized user management dashboard
+- Detailed authentication logs and analytics 
