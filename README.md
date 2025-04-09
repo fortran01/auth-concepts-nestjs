@@ -604,3 +604,81 @@ To use Auth0 with this demo:
 - Multi-factor Authentication (MFA)
 - Centralized user management dashboard
 - Detailed authentication logs and analytics 
+
+## Auth0 API Authentication Implementation
+
+The Auth0 API Authentication implementation demonstrates how to secure backend APIs using Auth0's Machine-to-Machine authentication flow. This implementation follows the OAuth 2.0 Client Credentials Grant, which is designed for server-to-server (M2M) communication where no user is involved.
+
+### Components Used
+
+1. **Auth0JwtStrategy** - Implements JWT validation using Auth0's JSON Web Key Set (JWKS) endpoint
+2. **Auth0JwtGuard** - Protects API routes requiring valid Auth0 tokens 
+3. **Auth0ApiController** - Provides public and protected API endpoints to demonstrate the security
+4. **Auth0ApiService** - Handles M2M token acquisition from Auth0
+5. **Auth0ApiDemoController** - Serves the demo interface for testing
+
+### Auth0 API Authentication Flow
+
+The implementation follows this flow:
+
+1. A client (another service or application) requests an access token from Auth0 using client credentials
+2. Auth0 validates the credentials and issues a JWT access token with appropriate audience and scope
+3. The client includes this token in the Authorization header when calling protected API endpoints
+4. The NestJS application validates the token using Auth0's JWKS endpoint
+5. If the token is valid and has the correct audience, the request is allowed
+6. If the token is invalid or missing, the request is rejected with a 401 Unauthorized error
+
+### Setting Up Auth0 API Authentication
+
+To use this feature, you need to configure Auth0 correctly:
+
+1. **Create an API in Auth0**:
+   - Go to Auth0 Dashboard > Applications > APIs
+   - Create a new API
+   - Set the Identifier (audience) to match your `AUTH0_API_AUDIENCE` env var (e.g., `http://localhost:3001`)
+   - Configure any permissions/scopes needed by your API
+
+2. **Create a Machine-to-Machine Application**:
+   - Go to Auth0 Dashboard > Applications > Applications
+   - Create a new Application of type "Machine to Machine"
+   - Select the API you created in the previous step
+   - Authorize the application to request access tokens for your API
+   - Select any needed scopes
+
+3. **Update Environment Variables**:
+   - Set `AUTH0_DOMAIN` to your Auth0 tenant domain
+   - Set `AUTH0_API_AUDIENCE` to your API's identifier
+   - Set `AUTH0_M2M_CLIENT_ID` to your M2M application's client ID
+   - Set `AUTH0_M2M_CLIENT_SECRET` to your M2M application's client secret
+
+### Testing Auth0 API Authentication
+
+The implementation includes several ways to test the API:
+
+1. **Using the Demo UI**:
+   - Visit `/auth0-api-demo` to use the interactive demo
+   - Click "Get New Token" to request an M2M token from Auth0
+   - Use the buttons to test both public and protected endpoints
+
+2. **Using the Test Script**:
+   - Run `npm run test:auth0:api` to test the authentication flow from the command line
+   - This script will get a token and call the protected API endpoint
+
+3. **Using Curl or Postman**:
+   - Get a token using the Auth0 Management API
+   - Call the API endpoints with the token:
+     ```bash
+     curl -H "Authorization: Bearer YOUR_TOKEN" http://localhost:3001/api/auth0/protected
+     ```
+
+### Troubleshooting
+
+If you encounter issues with Auth0 API authentication:
+
+1. Visit `/auth0-api-debug` to see your current Auth0 configuration
+2. Check that all environment variables are correctly set
+3. Verify in the Auth0 Dashboard that:
+   - Your API exists with the correct identifier
+   - Your M2M application exists with the correct client ID
+   - The M2M application has permission to access the API
+   - The audience in your requests matches the API identifier 

@@ -133,6 +133,25 @@
                     </div>
                 </div>
                 
+                <!-- Auth0 API Demo Section -->
+                <div class="mt-4">
+                    <div class="card mb-3">
+                        <div class="card-header bg-primary text-white">
+                            <h4 class="mb-0">Securing a Backend API with Auth0</h4>
+                        </div>
+                        <div class="card-body">
+                            <p>This demo shows how to secure a backend API with Auth0 JWT tokens:</p>
+                            <ul>
+                                <li>JWT token validation using Auth0's JWKS endpoint</li>
+                                <li>Public and protected API endpoints</li>
+                                <li>Machine-to-machine (M2M) authentication</li>
+                                <li>Token-based authorization with scopes</li>
+                            </ul>
+                            <a href="/auth0-api-demo" class="btn btn-primary">Try Auth0 API Demo</a>
+                        </div>
+                    </div>
+                </div>
+                
                 <div class="mt-4">
                     <h4>API Endpoints</h4>
                     <p>The following API endpoints are available for testing:</p>
@@ -177,6 +196,24 @@
                                     <td>JWT Token</td>
                                     <td>Protected API endpoint requiring JWT token</td>
                                 </tr>
+                                <tr>
+                                    <td><code>/api/auth0/public</code></td>
+                                    <td>GET</td>
+                                    <td>None</td>
+                                    <td>Public API endpoint (no authentication required)</td>
+                                </tr>
+                                <tr>
+                                    <td><code>/api/auth0/protected</code></td>
+                                    <td>GET</td>
+                                    <td>Auth0 JWT</td>
+                                    <td>Protected API endpoint requiring Auth0 token</td>
+                                </tr>
+                                <tr>
+                                    <td><code>/api/auth0/data</code></td>
+                                    <td>POST</td>
+                                    <td>Auth0 JWT</td>
+                                    <td>Protected API endpoint for creating data</td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -207,6 +244,17 @@ TOKEN=$(curl -s -X POST -H "Content-Type: application/json" -d '{"username":"adm
 
 # Then use the token to access protected resources
 curl -H "Authorization: Bearer $TOKEN" http://localhost:3000/token/data</pre>
+                    </div>
+                    
+                    <h5 class="mt-3">Auth0 API Authentication</h5>
+                    <p>Testing Auth0 API Authentication with curl:</p>
+                    <div class="bg-light p-3 rounded">
+                        <pre>
+# Run the test script to get a token and call the protected endpoint
+npm run test:auth0:api
+
+# Or visit the interactive demo
+open http://localhost:3001/auth0-api-demo</pre>
                     </div>
                     
                     <p class="mt-2">Default credentials for all authentication methods:</p>
