@@ -44,25 +44,36 @@
                                         <td>{{user.cn}}</td>
                                     </tr>
                                     <tr>
-                                        <th>First Name</th>
+                                        <th>First Name (givenName)</th>
                                         <td>{{user.givenName}}</td>
                                     </tr>
                                     <tr>
-                                        <th>Last Name</th>
+                                        <th>Last Name (sn)</th>
                                         <td>{{user.sn}}</td>
                                     </tr>
                                     <tr>
-                                        <th>Email</th>
+                                        <th>Email (mail)</th>
                                         <td>{{user.mail}}</td>
                                     </tr>
-                                    {{#if user.title}}
                                     <tr>
-                                        <th>Title</th>
+                                        <th>Job Title (title)</th>
                                         <td>{{user.title}}</td>
                                     </tr>
-                                    {{/if}}
                                 </tbody>
                             </table>
+                        </div>
+                        <div class="mt-3">
+                            <div class="alert alert-secondary">
+                                <h5>Fields Used in LDAP Setup:</h5>
+                                <ul>
+                                    <li><strong>uid</strong>: User identifier (e.g., john.doe)</li>
+                                    <li><strong>cn</strong>: Common Name - full name (e.g., John Doe)</li>
+                                    <li><strong>sn</strong>: Surname - last name (e.g., Doe)</li>
+                                    <li><strong>givenName</strong>: First name (e.g., John)</li>
+                                    <li><strong>mail</strong>: Email address (e.g., john.doe@example.org)</li>
+                                    <li><strong>title</strong>: Job title (e.g., Software Engineer)</li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -83,7 +94,10 @@
                 </div>
             </div>
             <div class="card-footer">
-                <a href="/" class="btn btn-outline-secondary">Back to Home</a>
+                <div class="d-flex justify-content-between">
+                    <a href="/" class="btn btn-outline-secondary">Back to Home</a>
+                    <a href="/auth/ldap/logout" class="btn btn-danger">Logout</a>
+                </div>
             </div>
         </div>
     </div>

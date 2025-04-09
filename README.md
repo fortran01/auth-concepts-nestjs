@@ -72,6 +72,7 @@ The demo provides these endpoints:
 - `GET /auth/digest` - Protected by Digest Authentication
 - `GET /auth/ldap` - LDAP Authentication login form
 - `POST /auth/ldap/login` - LDAP Authentication endpoint
+- `GET /auth/ldap/logout` - LDAP logout endpoint
 - `GET /auth/session/login` - Form login for session-based authentication
 - `GET /auth/session/protected` - Protected by session authentication
 - `GET /auth/session/setup-mfa` - Setup Multi-Factor Authentication
@@ -264,21 +265,72 @@ Note: For MFA-enabled accounts, additional steps are required to complete authen
 
 ### LDAP Authentication
 
-LDAP Authentication is best tested through the browser interface at:
-```
-http://localhost:3000/auth/ldap
-```
+This demo includes a direct LDAP authentication method that authenticates users against an OpenLDAP server.
 
-You can also test programmatically using curl for the POST endpoint:
+### How it works
+
+1. User submits their username and password through a form
+2. The application attempts to bind to the LDAP server using the user's credentials
+3. If the binding is successful, the user is authenticated
+4. The application retrieves the user's LDAP attributes and displays them
+5. User can log out by clicking the logout button, which redirects to the login page
+
+### Authentication Flow
+
+1. **Login**: Submit credentials to `/auth/ldap/login`
+2. **Authentication**: Direct binding to LDAP server with the provided credentials
+3. **Access**: Upon successful authentication, access to protected information
+4. **Logout**: Click the logout button to end the session and return to login page
+
+### Setup
+
+1. Start the Docker containers which include OpenLDAP:
 
 ```bash
-# Test LDAP login with curl
-curl -v -X POST http://localhost:3000/auth/ldap/login \
-  -H "Content-Type: application/x-www-form-urlencoded" \
-  -d "username=john.doe&password=password123"
+docker-compose up -d
 ```
 
-Note: The full HTML response will be returned as LDAP authentication renders pages server-side.
+2. Initialize the LDAP directory with test users:
+
+```bash
+npm run setup-ldap
+```
+
+3. Access the LDAP authentication demo at `/auth/ldap`
+
+### Test Users
+
+The following test users are created in the LDAP directory:
+
+| Username | Password |
+|----------|----------|
+| john.doe | password123 |
+| jane.smith | password456 |
+
+### LDAP Admin Interface
+
+The demo also includes phpLDAPadmin, a web-based LDAP client to browse and manage the LDAP directory.
+
+- Access URL: http://localhost:8090
+- Login DN: `cn=admin,dc=example,dc=org`
+- Password: `admin_password`
+
+### Implementation Details
+
+The LDAP authentication implementation uses these key components:
+
+1. **LdapService**: Handles LDAP connection, binding and directory operations
+2. **LdapController**: Manages the authentication flow and rendering templates
+3. **Docker-based LDAP Server**: Provides a fully functional OpenLDAP server for testing
+4. **phpLDAPadmin**: Offers a web interface for LDAP directory management
+
+### Security Considerations
+
+- No passwords are stored in the application; authentication is delegated to the LDAP server
+- In production environments, always use LDAPS (LDAP over SSL/TLS) to encrypt credentials
+- Use service accounts with least privilege for directory operations
+- Implement rate limiting to prevent brute force attacks
+- Apply proper error handling to avoid information disclosure 
 
 ## Stateless Authentication Implementation
 
@@ -493,64 +545,3 @@ Each scenario in the demo shows a different aspect of CORS:
 5. **Scenario 5** - Complete CORS configuration: Shows a comprehensive set of CORS headers including credentials support
 
 For deeper understanding, open your browser's Developer Tools and observe the Network tab while using the demo to see how CORS headers affect the requests. 
-
-## LDAP Authentication
-
-This demo includes a direct LDAP authentication method that authenticates users against an OpenLDAP server.
-
-### How it works
-
-1. User submits their username and password through a form
-2. The application attempts to bind to the LDAP server using the user's credentials
-3. If the binding is successful, the user is authenticated
-4. The application retrieves the user's LDAP attributes and displays them
-
-### Setup
-
-1. Start the Docker containers which include OpenLDAP:
-
-```bash
-docker-compose up -d
-```
-
-2. Initialize the LDAP directory with test users:
-
-```bash
-npm run setup-ldap
-```
-
-3. Access the LDAP authentication demo at `/auth/ldap`
-
-### Test Users
-
-The following test users are created in the LDAP directory:
-
-| Username | Password |
-|----------|----------|
-| john.doe | password123 |
-| jane.smith | password456 |
-
-### LDAP Admin Interface
-
-The demo also includes phpLDAPadmin, a web-based LDAP client to browse and manage the LDAP directory.
-
-- Access URL: http://localhost:8090
-- Login DN: `cn=admin,dc=example,dc=org`
-- Password: `admin_password`
-
-### Implementation Details
-
-The LDAP authentication implementation uses these key components:
-
-1. **LdapService**: Handles LDAP connection, binding and directory operations
-2. **LdapController**: Manages the authentication flow and rendering templates
-3. **Docker-based LDAP Server**: Provides a fully functional OpenLDAP server for testing
-4. **phpLDAPadmin**: Offers a web interface for LDAP directory management
-
-### Security Considerations
-
-- No passwords are stored in the application; authentication is delegated to the LDAP server
-- In production environments, always use LDAPS (LDAP over SSL/TLS) to encrypt credentials
-- Use service accounts with least privilege for directory operations
-- Implement rate limiting to prevent brute force attacks
-- Apply proper error handling to avoid information disclosure 

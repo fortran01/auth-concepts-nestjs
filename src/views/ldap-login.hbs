@@ -15,6 +15,12 @@
                 </div>
                 {{/if}}
 
+                {{#if success}}
+                <div class="alert alert-success" role="alert">
+                    <strong>Success:</strong> {{success}}
+                </div>
+                {{/if}}
+
                 <div class="mb-4">
                     <h4>How LDAP Authentication Works</h4>
                     <ul>
